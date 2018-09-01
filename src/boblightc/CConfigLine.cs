@@ -2,12 +2,12 @@
 {
     internal class CConfigLine
     {
-        private string buff;
-        private int linenr;
+        public string line { get; private set; }
+        public int linenr { get; private set; }
 
         public CConfigLine(string buff, int linenr)
         {
-            this.buff = buff;
+            this.line = buff;
             this.linenr = linenr;
         }
     }

@@ -43,8 +43,8 @@ namespace boblightc
                 //load and parse config
                 if (!config.LoadConfigFromFile(configfile))
                     return; // failed
-                //if (!config.CheckConfig())
-                //    return 1;
+                if (!config.CheckConfig())
+                    return;
                 //if (!config.BuildConfig(clients, devices, lights))
                 //    return 1;
             }

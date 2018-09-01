@@ -8,6 +8,7 @@ namespace boblightc
         internal static void LogError(string v)
         {
             //TODO: Provide implementation
+            throw new Exception(v);
         }
 
         internal static void Log(string v)
@@ -42,6 +43,8 @@ namespace boblightc
             }
 
             data = data.Substring(pos);
+
+            data = data.Trim();
 
             //TODO: Not sure why this is here
             //datastream.clear();
