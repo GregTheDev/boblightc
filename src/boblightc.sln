@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2003
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "boblightc", "boblightc\boblightc.csproj", "{FBD358D8-3C2F-45BF-B39F-BF32A4402A72}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FBD358D8-3C2F-45BF-B39F-BF32A4402A72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBD358D8-3C2F-45BF-B39F-BF32A4402A72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBD358D8-3C2F-45BF-B39F-BF32A4402A72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBD358D8-3C2F-45BF-B39F-BF32A4402A72}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA13B91A-F2F8-4303-8DD8-0C03CE384435}
+	EndGlobalSection
+EndGlobal
