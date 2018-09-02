@@ -1,6 +1,8 @@
-﻿    using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace boblightc
 {
@@ -33,9 +35,9 @@ namespace boblightc
             //signal(SIGTERM, SignalHandler);
             //signal(SIGINT, SignalHandler);
 
-            //vector<CDevice*> devices; //where we store devices
-            //vector<CLight> lights;  //lights pool
-            //CClientsHandler clients(lights);
+            List<CDevice> devices = new List<CDevice>(); //where we store devices
+            List<CLight> lights = new List<CLight>();  //lights pool
+            CClientsHandler clients = new CClientsHandler(lights);
 
             { //save some ram by removing CConfig from the stack when it's not needed anymore
                 CConfig config = new CConfig();
@@ -45,8 +47,8 @@ namespace boblightc
                     return; // failed
                 if (!config.CheckConfig())
                     return;
-                //if (!config.BuildConfig(clients, devices, lights))
-                //    return 1;
+                if (!config.BuildConfig(clients, devices, lights))
+                    return;
             }
             //start the devices
             //Log("starting devices");

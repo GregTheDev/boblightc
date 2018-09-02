@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Globalization;
+using System.Threading;
 
 namespace boblightc
 {
@@ -134,6 +135,587 @@ namespace boblightc
             }
 
             return true;
+        }
+
+        internal bool BuildConfig(CClientsHandler clients, List<CDevice> devices, List<CLight> lights)
+        {
+            Util.Log("building config");
+
+            BuildClientsHandlerConfig(clients);
+
+            List<CColor> colors = new List<CColor>();
+            if (!BuildColorConfig(colors))
+                return false;
+
+            if (!BuildDeviceConfig(devices, clients))
+                return false;
+
+            if (!BuildLightConfig(lights, devices, colors))
+                return false;
+
+            Util.Log("built config successfully");
+
+            return true;
+        }
+
+        private void BuildClientsHandlerConfig(CClientsHandler clients)
+        {
+            //set up where to bind the listening socket
+            //config for this should already be valid here, of course we can't check yet if the interface actually exists
+            string interfaceAddress = String.Empty; //empty string means bind to *
+            int port = 19333; //default port
+            for (int i = 0; i < m_globalconfiglines.Count; i++)
+            {
+                string line = m_globalconfiglines[i].line;
+                string word;
+                Util.GetWord(ref line, out word);
+
+                if (word == "interface")
+                {
+                    Util.GetWord(ref line, out interfaceAddress);
+                }
+                else if (word == "port")
+                {
+                    Util.GetWord(ref line, out word);
+                    port = int.Parse(word);
+                }
+            }
+            clients.SetInterface(interfaceAddress, port);
+        }
+
+        private bool BuildColorConfig(List<CColor> colors)
+        {
+            for (int i = 0; i < m_colorlines.Count; i++)
+            {
+                CColor color = new CColor();
+                for (int j = 0; j < m_colorlines[i].lines.Count; j++)
+                {
+                    string line = m_colorlines[i].lines[j].line;
+                    string key, value;
+
+                    Util.GetWord(ref line, out key);
+                    Util.GetWord(ref line, out value);
+
+                    if (key == "name")
+                    {
+                        color.Name = value;
+                    }
+                    else if (key == "rgb")
+                    {
+                        int irgb;
+                        float[] frgb = new float[3];
+
+                        irgb = int.Parse(value, NumberStyles.HexNumber, null);
+
+                        for (int k = 0; k < 3; k++)
+                            frgb[k] = (float)(((irgb >> ((2 - k) * 8)) & 0xFF) / 255.0);
+
+                        color.Rgb = frgb;
+                    }
+                    else if (key == "gamma")
+                    {
+                        float gamma;
+                        Util.ConvertFloatLocale(ref value);
+                        gamma = float.Parse(value);
+                        color.Gamma = gamma;
+                    }
+                    else if (key == "adjust")
+                    {
+                        float adjust;
+                        Util.ConvertFloatLocale(ref value);
+                        adjust = float.Parse(value);
+                        color.Adjust = adjust;
+                    }
+                    else if (key == "blacklevel")
+                    {
+                        float blacklevel;
+                        Util.ConvertFloatLocale(ref value);
+                        blacklevel = float.Parse(value);
+                        color.Blacklevel = blacklevel;
+                    }
+                }
+
+                //we need at least a name for a color
+                if (String.IsNullOrEmpty(color.Name))
+                {
+                    Util.LogError($"{m_filename}: color {i + 1} has no name");
+                    return false;
+                }
+
+                colors.Add(color);
+            }
+
+            return true;
+        }
+
+        private bool BuildLightConfig(List<CLight> lights, List<CDevice> devices, List<CColor> colors)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool BuildDeviceConfig(List<CDevice> devices, CClientsHandler clients)
+        {
+            for (int i = 0; i < m_devicelines.Count; i++)
+            {
+                string line;
+                int linenr = GetLineWithKey("type", m_devicelines[i].lines, out line);
+                string type;
+
+                Util.GetWord(ref line, out type);
+
+                if (type == "popen")
+                {
+                    throw new NotImplementedException("'popen' devices not supported yet");
+                    //CDevice device = null;
+                    //if (!BuildPopen(device, i, clients))
+                    //{
+                    //    if (device)
+                    //        delete device;
+                    //    return false;
+                    //}
+                    //devices.push_back(device);
+                }
+                else if (type == "momo" || type == "atmo" || type == "karate" || type == "sedu")
+                {
+                    CDevice device = null;
+                    if (!BuildRS232(device, i, clients, type))
+                    {
+                        if (device != null)
+                            device = null; //TODO: Call dispose instead???
+                        return false;
+                    }
+                    devices.Add(device);
+                }
+                else if (type == "ltbl")
+                {
+                    throw new NotImplementedException("'ltbl' devices not supported yet");
+
+                    //CDevice* device = NULL;
+                    //if (!BuildLtbl(device, i, clients))
+                    //{
+                    //    if (device)
+                    //        delete device;
+                    //    return false;
+                    //}
+                    //devices.push_back(device);
+                }
+                else if (type == "ola")
+                {
+                    throw new NotImplementedException("'ola' devices not supported yet");
+
+                    //# ifdef HAVE_OLA
+                    //                    CDevice* device = NULL;
+                    //                    if (!BuildOla(device, i, clients))
+                    //                    {
+                    //                        if (device)
+                    //                            delete device;
+                    //                        return false;
+                    //                    }
+                    //                    devices.push_back(device);
+                    //#else
+                    //                    LogError("%s line %i: boblightd was built without ola, recompile with enabled ola support",
+                    //                             m_filename.c_str(), linenr);
+                    //                    return false;
+                    //#endif
+                }
+                else if (type == "sound")
+                {
+                    throw new NotImplementedException("'sound' devices not supported yet");
+
+                    //# ifdef HAVE_LIBPORTAUDIO
+                    //                    CDevice* device = NULL;
+                    //                    if (!BuildSound(device, i, clients))
+                    //                    {
+                    //                        if (device)
+                    //                            delete device;
+                    //                        return false;
+                    //                    }
+                    //                    devices.push_back(device);
+                    //#else
+                    //                    LogError("%s line %i: boblightd was built without portaudio, no support for sound devices",
+                    //                             m_filename.c_str(), linenr);
+                    //                    return false;
+                    //#endif
+                }
+                else if (type == "dioder")
+                {
+                    throw new NotImplementedException("'dioder' devices not supported yet");
+
+                    //CDevice* device = NULL;
+                    //if (!BuildDioder(device, i, clients))
+                    //{
+                    //    if (device)
+                    //        delete device;
+                    //    return false;
+                    //}
+                    //devices.push_back(device);
+                }
+                else if (type == "ambioder")
+                {
+                    throw new NotImplementedException("'ambioder' devices not supported yet");
+
+                    //CDevice* device = NULL;
+                    //if (!BuildAmbioder(device, i, clients))
+                    //{
+                    //    if (device)
+                    //        delete device;
+                    //    return false;
+                    //}
+                    //devices.push_back(device);
+                }
+                else if (type == "ibelight")
+                {
+                    throw new NotImplementedException("'ibelight' devices not supported yet");
+
+                    //# ifdef HAVE_LIBUSB
+                    //                    CDevice* device = NULL;
+                    //                    if (!BuildiBeLight(device, i, clients))
+                    //                    {
+                    //                        if (device)
+                    //                            delete device;
+                    //                        return false;
+                    //                    }
+                    //                    devices.push_back(device);
+                    //#else
+                    //                    LogError("%s line %i: boblightd was built without libusb, no support for ibelight devices",
+                    //                             m_filename.c_str(), linenr);
+                    //                    return false;
+                    //#endif
+                }
+                else if (type == "lightpack")
+                {
+                    throw new NotImplementedException("'lightpack' devices not supported yet");
+
+                    //# ifdef HAVE_LIBUSB
+                    //                    CDevice* device = NULL;
+                    //                    if (!BuildLightpack(device, i, clients))
+                    //                    {
+                    //                        if (device)
+                    //                            delete device;
+                    //                        return false;
+                    //                    }
+                    //                    devices.push_back(device);
+                    //#else
+                    //                    LogError("%s line %i: boblightd was built without libusb, no support for lightpack devices",
+                    //                             m_filename.c_str(), linenr);
+                    //                    return false;
+                    //#endif
+                }
+                else if (type == "lpd8806" || type == "ws2801")
+                {
+                    throw new NotImplementedException("'lpd8806' and 'ws2801' devices are not supported yet");
+
+                    //# ifdef HAVE_LINUX_SPI_SPIDEV_H
+                    //                    CDevice* device = NULL;
+                    //                    if (!BuildSPI(device, i, clients, type))
+                    //                    {
+                    //                        if (device)
+                    //                            delete device;
+                    //                        return false;
+                    //                    }
+                    //                    devices.push_back(device);
+                    //#else
+                    //                    LogError("%s line %i: boblightd was built without spi, no support for lpd8806 devices",
+                    //                             m_filename.c_str(), linenr);
+                    //                    return false;
+                    //#endif
+                }
+                else
+                {
+                    Util.LogError($"{m_filename} line {linenr}: unknown type {type}");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool BuildRS232(CDevice device, int devicenr, CClientsHandler clients, string type)
+        {
+            CDeviceRS232 rs232device = new CDeviceRS232(clients);
+            device = rs232device;
+
+            if (!SetDeviceName(rs232device, devicenr))
+                return false;
+
+            if (!SetDeviceOutput(rs232device, devicenr))
+                return false;
+
+            if (!SetDeviceChannels(rs232device, devicenr))
+                return false;
+
+            if (!SetDeviceRate(rs232device, devicenr))
+                return false;
+
+            if (!SetDeviceInterval(rs232device, devicenr))
+                return false;
+
+            SetDeviceAllowSync(device, devicenr);
+            SetDeviceDebug(device, devicenr);
+            SetDeviceDelayAfterOpen(device, devicenr);
+            SetDeviceThreadPriority(device, devicenr);
+
+            bool hasbits = SetDeviceBits(rs232device, devicenr);
+            bool hasmax = SetDeviceMax(rs232device, devicenr);
+            if (hasbits && hasmax)
+            {
+                Util.LogError($"{m_filename}: device {rs232device.Name} has both bits and max set");
+                return false;
+            }
+
+            if (type == "momo")
+            {
+                device.Type = CDevice.MOMO;
+                SetDevicePrefix(rs232device, devicenr);
+                SetDevicePostfix(rs232device, devicenr);
+            }
+            else if (type == "atmo")
+            {
+                device.Type = CDevice.ATMO;
+            }
+            else if (type == "karate")
+            {
+                device.Type = CDevice.KARATE;
+            }
+            else if (type == "sedu")
+            {
+                device.Type = CDevice.SEDU;
+            }
+
+            return true;
+        }
+
+        private bool SetDeviceName(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("name", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+            {
+                Util.LogError($"{m_filename}: device {devicenr + 1} has no name");
+                return false;
+            }
+            Util.GetWord(ref line, out strvalue);
+            device.Name = strvalue;
+
+            return true;
+        }
+
+        private bool SetDeviceOutput(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("output", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+            {
+                Util.LogError($"{m_filename}: device {device.Name} has no output");
+                return false;
+            }
+            Util.GetWord(ref line, out strvalue);
+            device.Output = (strvalue + line);
+
+            return true;
+        }
+
+        private bool SetDeviceChannels(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("channels", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+            {
+                Util.LogError($"{m_filename}: device {device.Name} has no channels");
+                return false;
+            }
+            Util.GetWord(ref line, out strvalue);
+
+            int nrchannels;
+            nrchannels = int.Parse(strvalue);
+            device.NrChannels = nrchannels;
+
+            return true;
+        }
+
+        private bool SetDeviceRate(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("rate", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+            {
+                Util.LogError($"{m_filename}: device {device.Name} has no rate");
+                return false;
+            }
+            Util.GetWord(ref line, out strvalue);
+
+            int rate;
+            rate = int.Parse(strvalue);
+            device.Rate = rate;
+
+            return true;
+        }
+
+        private bool SetDeviceInterval(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("interval", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+            {
+                Util.LogError($"{m_filename}: device {device.Name} has no interval");
+                return false;
+            }
+            Util.GetWord(ref line, out strvalue);
+
+            int interval;
+            interval = int.Parse(strvalue);
+            device.Interval = interval;
+
+            return true;
+        }
+
+        private void SetDevicePrefix(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            List<int> prefix = new List<int>(); //TODO, confirm size of type uint8_t
+            int linenr = GetLineWithKey("prefix", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+            {
+                return; //prefix is optional, so this is not an error 
+            }
+
+            while (Util.GetWord(ref line, out strvalue))
+            {
+                int iprefix;
+                iprefix = int.Parse(strvalue, NumberStyles.HexNumber, null);
+                prefix.Add(iprefix);
+            }
+            device.Prefix = prefix;
+        }
+
+        private void SetDevicePostfix(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            List<int> postfix = new List<int>(); //TODO, confirm size of type uint8_t
+            int linenr = GetLineWithKey("postfix", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+            {
+                return; //postfix is optional, so this is not an error 
+            }
+
+            while (Util.GetWord(ref line, out strvalue))
+            {
+                int ipostfix;
+                ipostfix = int.Parse(strvalue, NumberStyles.HexNumber, null);
+                postfix.Add(ipostfix);
+            }
+            device.Postfix = postfix;
+        }
+
+        private void SetDeviceAllowSync(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("allowsync", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+                return;
+
+            Util.GetWord(ref line, out strvalue);
+
+            bool allowsync;
+            allowsync = bool.Parse(strvalue);
+            device.AllowSync = allowsync;
+        }
+
+        private void SetDeviceDebug(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("debug", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+                return;
+
+            Util.GetWord(ref line, out strvalue);
+
+            // Port: seems some versions of config file allow for on/off and other true/false
+            if (strvalue == "off") strvalue = "false";
+            if (strvalue == "on") strvalue = "true";
+
+            bool debug;
+            debug = bool.Parse(strvalue);
+            device.Debug = debug;
+        }
+
+        private bool SetDeviceBits(CDeviceRS232 device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("bits", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+                return false;
+
+            Util.GetWord(ref line, out strvalue);
+
+            int bits;
+            bits = int.Parse(strvalue);
+            device.Max = (1 << bits) - 1; //TODO: verify ((1 << (int64_t)bits) - 1);
+
+            return true;
+        }
+
+        private bool SetDeviceMax(CDeviceRS232 device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("max", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+                return false;
+
+            Util.GetWord(ref line, out strvalue);
+
+            Int64 max;
+            max = Int64.Parse(strvalue);
+            device.Max = max;
+
+            return true;
+        }
+
+        private void SetDeviceDelayAfterOpen(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("delayafteropen", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+                return;
+
+            Util.GetWord(ref line, out strvalue);
+
+            int delayafteropen;
+            delayafteropen = int.Parse(strvalue);
+            device.DelayAfterOpen = delayafteropen;
+        }
+
+        private void SetDeviceThreadPriority(CDevice device, int devicenr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("threadpriority", m_devicelines[devicenr].lines, out line);
+            if (linenr == -1)
+                return;
+
+            Util.GetWord(ref line, out strvalue);
+
+            int priority;
+            priority = int.Parse(strvalue); // TODO: windows priority vs unix priority? do old configs line up???
+            device.ThreadPriority = (ThreadPriority) priority;
+        }
+
+        private int GetLineWithKey(string key, List<CConfigLine> lines, out string line)
+        {
+            line = String.Empty; // null??
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string word;
+                line = lines[i].line;
+                Util.GetWord(ref line, out word);
+
+                if (word == key)
+                {
+                    return lines[i].linenr;
+                }
+            }
+
+            return -1;
         }
 
         internal bool CheckConfig()

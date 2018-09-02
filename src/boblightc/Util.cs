@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace boblightc
 {
@@ -55,6 +56,14 @@ namespace boblightc
             //    data.clear();
 
             return true;
+        }
+
+        internal static void ConvertFloatLocale(ref string value)
+        {
+            string localDecimalSeperator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+            value.Replace(",", localDecimalSeperator);
+            value.Replace(".", localDecimalSeperator);
         }
     }
 }
