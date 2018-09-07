@@ -20,5 +20,10 @@ namespace boblightc
 
         public string InterfaceAddress { get; private set; }
         public int Port { get; private set; }
+
+        internal void Process()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

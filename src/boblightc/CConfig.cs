@@ -250,7 +250,126 @@ namespace boblightc
 
         private bool BuildLightConfig(List<CLight> lights, List<CDevice> devices, List<CColor> colors)
         {
-            throw new NotImplementedException();
+            CLight globallight = new CLight(); //TOD: "default values" ???
+
+            for (int i = 0; i < m_lightlines.Count; i++)
+            {
+                CLight light = globallight;
+
+                if (!SetLightName(light, m_lightlines[i].lines, i))
+                    return false;
+
+                SetLightScanRange(light, m_lightlines[i].lines);
+
+                //check the colors on a light
+                for (int j = 0; j < m_lightlines[i].lines.Count; j++)
+                {
+                    string line = m_lightlines[i].lines[j].line;
+                    string key;
+                    Util.GetWord(ref line, out key);
+
+                    if (key != "color")
+                        continue;
+
+                    //we already checked these in the syntax check
+                    string colorname, devicename, devicechannel;
+                    Util.GetWord(ref line, out colorname);
+                    Util.GetWord(ref line, out devicename);
+                    Util.GetWord(ref line, out devicechannel);
+
+                    bool colorfound = false;
+                    for (int k = 0; k < colors.Count; k++)
+                    {
+                        if (colors[k].Name == colorname)
+                        {
+                            colorfound = true;
+                            light.AddColor(colors[k]);
+                            break;
+                        }
+                    }
+                    if (!colorfound) //this color doesn't exist
+                    {
+                        Util.LogError($"{m_filename} line {m_lightlines[i].lines[j].linenr}: no color with name {colorname}");
+                        return false;
+                    }
+
+                    int ichannel;
+                    ichannel = int.Parse(devicechannel);
+
+                    //loop through the devices, check if one with this name exists and if the channel on it exists
+                    bool devicefound = false;
+                    for (int k = 0; k < devices.Count; k++)
+                    {
+                        if (devices[k].Name == devicename)
+                        {
+                            if (ichannel > devices[k].NrChannels)
+                            {
+                                Util.LogError($"{m_filename} line {m_lightlines[i].lines[j].linenr}: channel {ichannel} wanted but device {devices[k].Name} has {devices[k].NrChannels} channels");
+                                return false;
+                            }
+                            devicefound = true;
+                            CChannel channel = new CChannel();
+                            channel.Color = (light.NrColors - 1);
+                            channel.Light = i;
+                            devices[k].SetChannel(channel, ichannel - 1);
+                            break;
+                        }
+                    }
+                    if (!devicefound)
+                    {
+                        Util.LogError($"{m_filename} line {m_lightlines[i].lines[j].linenr}: no device with name {devicename}");
+                        return false;
+                    }
+                }
+                lights.Add(light);
+            }
+
+            return true;
+        }
+
+        private void SetLightScanRange(CLight light, List<CConfigLine> lines)
+        {
+            //hscan and vdscan are optional
+
+            string line, strvalue;
+            int linenr = GetLineWithKey("hscan", lines, out line);
+            if (linenr != -1)
+            {
+                float[] hscan = new float[2];
+                string[] linePieces = line.Split(' ');
+                hscan[0] = float.Parse(linePieces[0]);
+                hscan[1] = float.Parse(linePieces[1]);
+
+                //sscanf(line.c_str(), "%f %f", hscan, hscan + 1);
+                light.SetHscan(hscan);
+            }
+
+            linenr = GetLineWithKey("vscan", lines, out line);
+            if (linenr != -1)
+            {
+                float[] vscan = new float[2];
+                string[] linePieces = line.Split(' ');
+                vscan[0] = float.Parse(linePieces[0]);
+                vscan[1] = float.Parse(linePieces[1]);
+
+                //sscanf(line.c_str(), "%f %f", vscan, vscan + 1);
+                light.SetVscan(vscan);
+            }
+        }
+
+        private bool SetLightName(CLight light, List<CConfigLine> lines, int lightnr)
+        {
+            string line, strvalue;
+            int linenr = GetLineWithKey("name", lines, out line);
+            if (linenr == -1)
+            {
+                Util.LogError($"{m_filename}: light {lightnr + 1} has no name");
+                return false;
+            }
+
+            Util.GetWord(ref line, out strvalue);
+            light.Name = strvalue;
+            return true;
         }
 
         private bool BuildDeviceConfig(List<CDevice> devices, CClientsHandler clients)
@@ -278,7 +397,7 @@ namespace boblightc
                 else if (type == "momo" || type == "atmo" || type == "karate" || type == "sedu")
                 {
                     CDevice device = null;
-                    if (!BuildRS232(device, i, clients, type))
+                    if (!BuildRS232(out device, i, clients, type))
                     {
                         if (device != null)
                             device = null; //TODO: Call dispose instead???
@@ -430,7 +549,7 @@ namespace boblightc
             return true;
         }
 
-        private bool BuildRS232(CDevice device, int devicenr, CClientsHandler clients, string type)
+        private bool BuildRS232(out CDevice device, int devicenr, CClientsHandler clients, string type)
         {
             CDeviceRS232 rs232device = new CDeviceRS232(clients);
             device = rs232device;

@@ -50,12 +50,14 @@ namespace boblightc
                 if (!config.BuildConfig(clients, devices, lights))
                     return;
             }
+
             //start the devices
-            //Log("starting devices");
-            //for (int i = 0; i < devices.size(); i++)
-            //    devices[i]->StartThread();
+            Util.Log("starting devices");
+            //for (int i = 0; i < devices.Count; i++)
+            //    devices[i].StartThread();
 
             //run the clients handler
+            //bool g_stop = false; //TODO: wait for console keypress
             //while (!g_stop)
             //    clients.Process();
 

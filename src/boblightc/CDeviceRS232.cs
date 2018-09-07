@@ -5,6 +5,7 @@
         private CClientsHandler clients;
 
         public CDeviceRS232(CClientsHandler clients)
+            : base()
         {
             this.clients = clients;
         }
