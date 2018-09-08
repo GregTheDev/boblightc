@@ -57,9 +57,9 @@ namespace boblightc
             //    devices[i].StartThread();
 
             //run the clients handler
-            //bool g_stop = false; //TODO: wait for console keypress
+            bool g_stop = false; //TODO: wait for console keypress
             //while (!g_stop)
-            //    clients.Process();
+                clients.Process();
 
             //signal that the devices should stop
             //Log("signaling devices to stop");
@@ -67,14 +67,14 @@ namespace boblightc
             //    devices[i]->AsyncStopThread();
 
             //clean up the clients handler
-            //clients.Cleanup();
+            clients.Cleanup();
 
             //stop the devices
             //Log("waiting for devices to stop");
             //for (int i = 0; i < devices.size(); i++)
             //    devices[i]->StopThread();
 
-            //Log("exiting");
+            Util.Log("exiting");
 
 
         }

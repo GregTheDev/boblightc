@@ -1,20 +1,32 @@
-﻿using System;
+﻿using log4net;
+using log4net.Config;
+using System;
 using System.Globalization;
+using System.IO;
+using System.Reflection;
 
 namespace boblightc
 {
     internal class Util
     {
+        private static ILog _logger;
 
-        internal static void LogError(string v)
+        static Util()
         {
-            //TODO: Provide implementation
-            throw new Exception(v);
+            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+
+            _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         }
 
-        internal static void Log(string v)
+        internal static void LogError(string message)
         {
-            //TODO: Provide implementation
+            _logger.Error(message);
+        }
+
+        internal static void Log(string message)
+        {
+            _logger.Debug(message);
         }
 
         internal static bool GetWord(ref string data, out string word)
