@@ -14,5 +14,10 @@ namespace boblightc
         {
             return m_data.Length;
         }
+
+        internal void SetData(string v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -6,9 +6,36 @@ namespace boblightc
 {
     internal class CTcpServerSocket : CTcpSocket
     {
-        public int Accept(CTcpClientSocket socket)
+        public bool Accept(CTcpClientSocket socket)
         {
-            throw new NotImplementedException();
+            if (m_sock == null || !IsOpen)
+            {
+                m_error = "socket closed";
+                return false;
+            }
+
+            bool returnv = WaitForSocket(false, "Accept");  //wait for socket to become readable
+
+            if (!returnv) return false;
+
+            try
+            {
+                Socket acceptedSocket = m_sock.Accept();
+                //int sock = accept(m_sock, reinterpret_cast <struct sockaddr*>(&client), &clientlen);
+
+                if (!socket.SetInfo(acceptedSocket))
+                {
+                    m_error = socket.GetError();
+                    return false;
+                }
+            }
+            catch (SocketException sockEx)
+            {
+                m_error = "select() " + m_address + ":" + m_port + " " + sockEx.NativeErrorCode + " " + sockEx.SocketErrorCode; //TODO: format this better
+                return false;
+            }
+
+            return true;
         }
 
         internal override bool Open(string address, int port, int usectimeout = -1)

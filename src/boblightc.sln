@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "boblightc", "boblightc\boblightc.csproj", "{FBD358D8-3C2F-45BF-B39F-BF32A4402A72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "boblightc", "boblightc\boblightc.csproj", "{FBD358D8-3C2F-45BF-B39F-BF32A4402A72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "boblight_tester", "boblight_tester\boblight_tester.csproj", "{7CB2B24F-8478-4202-BF6C-44400534CD2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{FBD358D8-3C2F-45BF-B39F-BF32A4402A72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBD358D8-3C2F-45BF-B39F-BF32A4402A72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBD358D8-3C2F-45BF-B39F-BF32A4402A72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CB2B24F-8478-4202-BF6C-44400534CD2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CB2B24F-8478-4202-BF6C-44400534CD2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CB2B24F-8478-4202-BF6C-44400534CD2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CB2B24F-8478-4202-BF6C-44400534CD2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

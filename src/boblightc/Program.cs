@@ -3,11 +3,15 @@ using System.IO;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace boblightc
 {
     class Program
     {
+        private static bool g_stop = false; //TODO: wait for console keypress
+        private static ManualResetEvent _stopEvent;
+
         static void Main(string[] args)
         {
             //read flags
@@ -57,8 +61,10 @@ namespace boblightc
             //    devices[i].StartThread();
 
             //run the clients handler
-            bool g_stop = false; //TODO: wait for console keypress
-            //while (!g_stop)
+            _stopEvent = new ManualResetEvent(false);
+
+            Console.CancelKeyPress += Console_CancelKeyPress;
+            while (!_stopEvent.WaitOne(0))
                 clients.Process();
 
             //signal that the devices should stop
@@ -77,6 +83,14 @@ namespace boblightc
             Util.Log("exiting");
 
 
+        }
+
+        private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            g_stop = true;
+            _stopEvent.Set();
+
+            e.Cancel = true;
         }
     }
 }
