@@ -8,8 +8,11 @@ using System.Threading.Tasks;
 
 namespace boblight_tester
 {
-    class BoblightClient
+    class BoblightClient : IDisposable
     {
+        // Flag: Has Dispose already been called?
+        bool disposed = false;
+
         private IPAddress _ipAddress;
         private int _port;
         private Socket _socket;
@@ -37,10 +40,46 @@ namespace boblight_tester
             _socket.Connect(_ipAddress, _port);
         }
 
+        public string Hello()
+        {
+            _socket.Send(Encoding.ASCII.GetBytes("hello\n"));
+
+            byte[] buffer = new byte[1024];
+            int receivedBytes = _socket.Receive(buffer);
+
+            string response = Encoding.ASCII.GetString(buffer, 0, receivedBytes);
+
+            return response;
+        }
+
         public void Close()
         {
             _socket.Close();
             _socket.Dispose();
+        }
+
+        // Public implementation of Dispose pattern callable by consumers.
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+            {
+                _socket.Close();
+                _socket.Dispose();
+                // Free any other managed objects here.
+                //
+            }
+
+            disposed = true;
         }
     }
 }

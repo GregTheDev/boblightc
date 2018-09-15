@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Linq;
 
 namespace boblightc
 {
@@ -69,28 +70,27 @@ namespace boblightc
                 }
                 else
                 {
-                    throw new NotImplementedException("Boo");
-                    ////get the client the sock fd belongs to
-                    //CClient client = GetClientFromSock(sock);
-                    //if (client == null) //guess it belongs to nobody
-                    //    continue;
+                    //get the client the sock fd belongs to
+                    CClient client = GetClientFromSock(sock);
+                    if (client == null) //guess it belongs to nobody
+                        continue;
 
-                    ////try to read data from the client
-                    //CTcpData data = null;
-                    //int returnv = client.m_socket.Read(data);
-                    //if (returnv == FAIL)
-                    //{ //socket broke probably
-                    //    Util.Log(client.m_socket.GetError());
-                    //    RemoveClient(client);
-                    //    continue;
-                    //}
+                    //try to read data from the client
+                    CTcpData data = new CTcpData();
+                    bool returnv = client.m_socket.Read(data);
+                    if (!returnv)
+                    { //socket broke probably
+                        Util.Log(client.m_socket.GetError());
+                        RemoveClient(client);
+                        continue;
+                    }
 
-                    ////add data to the messagequeue
-                    //client.m_messagequeue.AddData(data.GetData(), data.GetSize());
+                    //add data to the messagequeue
+                    client.m_messagequeue.AddData(data.GetData(), data.GetSize());
 
-                    ////check messages from the messaqueue and parse them, if it fails remove the client
-                    //if (!HandleMessages(client))
-                    //    RemoveClient(client);
+                    //check messages from the messaqueue and parse them, if it fails remove the client
+                    if (!HandleMessages(client))
+                        RemoveClient(client);
                 }
             }
         }
@@ -136,16 +136,15 @@ namespace boblightc
 
         internal void Cleanup()
         {
-#warning  FINISH THIS!!!!
             //kick off all clients
             Util.Log("disconnecting clients");
-            //TODO: need to do this
-            //CLock lock (m_mutex) ;
-            //while (m_clients.size())
-            //{
-            //    RemoveClient(m_clients.front());
-            //}
-            //lock.Leave();
+            
+            CLock _lock = new CLock(m_mutex);
+            while (m_clients.Count > 0)
+            {
+                RemoveClient(m_clients.First());
+            }
+            _lock.Leave();
 
             Util.Log("closing listening socket");
             m_socket.Close();
@@ -155,7 +154,52 @@ namespace boblightc
 
         private bool HandleMessages(CClient client)
         {
-            throw new NotImplementedException();
+            if (client.m_messagequeue.GetRemainingDataSize() > CMessageQueue.MAXDATA) //client sent too much data
+            {
+                Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent too much data");
+                return false;
+            }
+
+            //loop until there are no more messages
+            while (client.m_messagequeue.GetNrMessages() > 0)
+            {
+                CMessage message = client.m_messagequeue.GetMessage();
+                if (!ParseMessage(client, message))
+                    return false;
+            }
+            return true;
+        }
+
+        private bool ParseMessage(CClient client, CMessage message)
+        {
+            CTcpData data = new CTcpData();
+            string messagekey;
+            //an empty message is invalid
+            if (!Util.GetWord(ref message.message, out messagekey))
+            {
+                Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                return false;
+            }
+
+            if (messagekey == "hello")
+            {
+                Util.Log($"{client.m_socket.Address}:{client.m_socket.Port} said hello");
+                data.SetData("hello\n");
+                if (client.m_socket.Write(data) != true)
+                {
+                    Util.Log(client.m_socket.GetError());
+                    return false;
+                }
+
+                CLock _lock = new CLock(m_mutex);
+
+                if (client.m_connecttime == -1)
+                    client.m_connecttime = message.time;
+
+                _lock.Leave();
+            }
+
+            return true;
         }
 
         private void RemoveClient(CClient client)
@@ -163,9 +207,13 @@ namespace boblightc
             throw new NotImplementedException();
         }
 
-        private CClient GetClientFromSock(int sock)
+        private CClient GetClientFromSock(Socket sock)
         {
-            throw new NotImplementedException();
+            CLock _lock = new CLock(m_mutex);
+
+            var possibleMatch = m_clients.FirstOrDefault(client => client.m_socket.GetSock() == sock);
+
+            return possibleMatch;
         }
 
         private void AddClient(CClient client)

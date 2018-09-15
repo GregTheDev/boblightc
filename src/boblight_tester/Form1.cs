@@ -26,7 +26,21 @@ namespace boblight_tester
             _client = new BoblightClient(txtServerIp.Text, Int32.Parse(txtServerPort.Text));
             _client.Open();
 
-            txtLog.AppendText("Connected\r\n");
+            Log("Connected\r\n");
+        }
+
+        private void btnSendHello_Click(object sender, EventArgs e)
+        {
+            Log("Sending 'hello'...\r\n");
+            string response = _client.Hello();
+            Log("... sent\r\n");
+
+            Log($"Received '{response}' response\r\n");
+        }
+
+        private void Log(string message)
+        {
+            txtLog.AppendText(message);
         }
     }
 }

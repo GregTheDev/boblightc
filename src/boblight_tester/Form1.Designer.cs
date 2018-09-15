@@ -35,6 +35,7 @@
             this.btnConnect = new System.Windows.Forms.Button();
             this.btnDisconnect = new System.Windows.Forms.Button();
             this.txtLog = new System.Windows.Forms.TextBox();
+            this.btnSendHello = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtServerIp
@@ -92,18 +93,29 @@
             // 
             // txtLog
             // 
-            this.txtLog.Location = new System.Drawing.Point(121, 86);
+            this.txtLog.Location = new System.Drawing.Point(213, 86);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtLog.Size = new System.Drawing.Size(667, 352);
+            this.txtLog.Size = new System.Drawing.Size(575, 352);
             this.txtLog.TabIndex = 6;
+            // 
+            // btnSendHello
+            // 
+            this.btnSendHello.Location = new System.Drawing.Point(15, 84);
+            this.btnSendHello.Name = "btnSendHello";
+            this.btnSendHello.Size = new System.Drawing.Size(129, 23);
+            this.btnSendHello.TabIndex = 7;
+            this.btnSendHello.Text = "Send \"hello\"";
+            this.btnSendHello.UseVisualStyleBackColor = true;
+            this.btnSendHello.Click += new System.EventHandler(this.btnSendHello_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnSendHello);
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.btnDisconnect);
             this.Controls.Add(this.btnConnect);
@@ -128,6 +140,7 @@
         private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.Button btnDisconnect;
         private System.Windows.Forms.TextBox txtLog;
+        private System.Windows.Forms.Button btnSendHello;
     }
 }
 
