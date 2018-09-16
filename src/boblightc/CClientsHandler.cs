@@ -98,24 +98,24 @@ namespace boblightc
         internal IList<Socket> GetReadableFd()
         {
             const int WAITTIME = 10000000;
-            CLock _lock = new CLock(m_mutex);
-
-            //no clients so we just sleep
-            if (m_clients.Count == 0 && !m_socket.IsOpen)
-            {
-                _lock.Leave();
-                System.Threading.Thread.Sleep(1 * 1000); //TODO: change to manual reset event
-                //USleep(WAITTIME, &g_stop);
-                return new List<Socket>();
-            }
-
-            //store all the client sockets
             List<Socket> waitsockets = new List<Socket>();
-            waitsockets.Add(m_socket.GetSock());
-            for (int i = 0; i < m_clients.Count; i++)
-                waitsockets.Add(m_clients[i].m_socket.GetSock());
 
-            _lock.Leave();
+            lock (m_mutex)
+            {
+
+                //no clients so we just sleep
+                if (m_clients.Count == 0 && !m_socket.IsOpen)
+                {
+                    System.Threading.Thread.Sleep(1 * 1000); //TODO: change to manual reset event
+                                                             //USleep(WAITTIME, &g_stop);
+                    return new List<Socket>();
+                }
+
+                //store all the client sockets
+                waitsockets.Add(m_socket.GetSock());
+                for (int i = 0; i < m_clients.Count; i++)
+                    waitsockets.Add(m_clients[i].m_socket.GetSock());
+            }
 
             //struct timeval tv;
             //tv.tv_sec = WAITTIME / 1000000;
@@ -139,12 +139,13 @@ namespace boblightc
             //kick off all clients
             Util.Log("disconnecting clients");
             
-            CLock _lock = new CLock(m_mutex);
-            while (m_clients.Count > 0)
+            lock (m_mutex)
             {
-                RemoveClient(m_clients.First());
+                while (m_clients.Count > 0)
+                {
+                    RemoveClient(m_clients.First());
+                }
             }
-            _lock.Leave();
 
             Util.Log("closing listening socket");
             m_socket.Close();
@@ -191,12 +192,12 @@ namespace boblightc
                     return false;
                 }
 
-                CLock _lock = new CLock(m_mutex);
+                lock (m_mutex)
+                {
 
-                if (client.m_connecttime == -1)
-                    client.m_connecttime = message.time;
-
-                _lock.Leave();
+                    if (client.m_connecttime == -1)
+                        client.m_connecttime = message.time;
+                }
             }
             else if (messagekey == "ping")
             {
@@ -208,20 +209,21 @@ namespace boblightc
 
         private bool SendPing(CClient client)
         {
-            CLock _lock = new CLock(m_mutex);
-
-            //check if any light is used
             int lightsused = 0;
-            for (int i = 0; i < client.m_lights.Count; i++)
+
+            lock (m_mutex)
             {
-                if (client.m_lights[i].GetNrUsers() > 0)
+
+                //check if any light is used
+                for (int i = 0; i < client.m_lights.Count; i++)
                 {
-                    lightsused = 1;
-                    break; //if one light is used we have enough info
+                    if (client.m_lights[i].GetNrUsers() > 0)
+                    {
+                        lightsused = 1;
+                        break; //if one light is used we have enough info
+                    }
                 }
             }
-
-            _lock.Leave();
 
             CTcpData data = new CTcpData();
             data.SetData("ping " + lightsused + "\n");
@@ -241,11 +243,12 @@ namespace boblightc
 
         private CClient GetClientFromSock(Socket sock)
         {
-            CLock _lock = new CLock(m_mutex);
+            lock(m_mutex)
+            {
+                var possibleMatch = m_clients.FirstOrDefault(client => client.m_socket.GetSock() == sock);
 
-            var possibleMatch = m_clients.FirstOrDefault(client => client.m_socket.GetSock() == sock);
-
-            return possibleMatch;
+                return possibleMatch;
+            }
         }
 
         private void AddClient(CClient client)
@@ -253,21 +256,22 @@ namespace boblightc
             //TODO: google this
             const int FD_SETSIZE = 100;
 
-            CLock _lock = new CLock(m_mutex);
-
-            if (m_clients.Count >= FD_SETSIZE) //maximum number of clients reached
+            lock (m_mutex)
             {
-                Util.LogError($"number of clients reached maximum {FD_SETSIZE}");
-                CTcpData data = new CTcpData();
-                data.SetData("full\n");
-                client.m_socket.Write(data);
-                client = null;
-                return;
-            }
+                if (m_clients.Count >= FD_SETSIZE) //maximum number of clients reached
+                {
+                    Util.LogError($"number of clients reached maximum {FD_SETSIZE}");
+                    CTcpData data = new CTcpData();
+                    data.SetData("full\n");
+                    client.m_socket.Write(data);
+                    client = null;
+                    return;
+                }
 
-            //assign lights and put the pointer in the clients vector
-            client.InitLights(m_lights);
-            m_clients.Add(client);
+                //assign lights and put the pointer in the clients vector
+                client.InitLights(m_lights);
+                m_clients.Add(client);
+            }
         }
     }
 }
