@@ -36,6 +36,7 @@
             this.btnDisconnect = new System.Windows.Forms.Button();
             this.txtLog = new System.Windows.Forms.TextBox();
             this.btnSendHello = new System.Windows.Forms.Button();
+            this.btnSendPing = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtServerIp
@@ -110,11 +111,22 @@
             this.btnSendHello.UseVisualStyleBackColor = true;
             this.btnSendHello.Click += new System.EventHandler(this.btnSendHello_Click);
             // 
+            // btnSendPing
+            // 
+            this.btnSendPing.Location = new System.Drawing.Point(15, 113);
+            this.btnSendPing.Name = "btnSendPing";
+            this.btnSendPing.Size = new System.Drawing.Size(129, 23);
+            this.btnSendPing.TabIndex = 8;
+            this.btnSendPing.Text = "Send \"ping\"";
+            this.btnSendPing.UseVisualStyleBackColor = true;
+            this.btnSendPing.Click += new System.EventHandler(this.btnSendPing_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnSendPing);
             this.Controls.Add(this.btnSendHello);
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.btnDisconnect);
@@ -141,6 +153,7 @@
         private System.Windows.Forms.Button btnDisconnect;
         private System.Windows.Forms.TextBox txtLog;
         private System.Windows.Forms.Button btnSendHello;
+        private System.Windows.Forms.Button btnSendPing;
     }
 }
 

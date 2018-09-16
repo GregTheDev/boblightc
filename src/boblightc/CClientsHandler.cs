@@ -198,7 +198,39 @@ namespace boblightc
 
                 _lock.Leave();
             }
+            else if (messagekey == "ping")
+            {
+                return SendPing(client);
+            }
 
+            return true;
+        }
+
+        private bool SendPing(CClient client)
+        {
+            CLock _lock = new CLock(m_mutex);
+
+            //check if any light is used
+            int lightsused = 0;
+            for (int i = 0; i < client.m_lights.Count; i++)
+            {
+                if (client.m_lights[i].GetNrUsers() > 0)
+                {
+                    lightsused = 1;
+                    break; //if one light is used we have enough info
+                }
+            }
+
+            _lock.Leave();
+
+            CTcpData data = new CTcpData();
+            data.SetData("ping " + lightsused + "\n");
+
+            if (client.m_socket.Write(data) != true)
+            {
+                Util.Log(client.m_socket.GetError());
+                return false;
+            }
             return true;
         }
 

@@ -9,7 +9,7 @@ namespace boblightc
         public CMessageQueue m_messagequeue;
 
         internal long m_connecttime;
-        private List<CLight> m_lights;
+        internal List<CLight> m_lights;
         private Dictionary<string, int> m_lightnrs;
 
         public CClient()

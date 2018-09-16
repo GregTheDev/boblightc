@@ -42,7 +42,17 @@ namespace boblight_tester
 
         public string Hello()
         {
-            _socket.Send(Encoding.ASCII.GetBytes("hello\n"));
+            return SendAndReceive("hello");
+        }
+
+        internal string Ping()
+        {
+            return SendAndReceive("ping");
+        }
+
+        private string SendAndReceive(string commandName)
+        {
+            _socket.Send(Encoding.ASCII.GetBytes($"{commandName}\n"));
 
             byte[] buffer = new byte[1024];
             int receivedBytes = _socket.Receive(buffer);
@@ -51,6 +61,7 @@ namespace boblight_tester
 
             return response;
         }
+
 
         public void Close()
         {

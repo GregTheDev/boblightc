@@ -42,5 +42,14 @@ namespace boblight_tester
         {
             txtLog.AppendText(message);
         }
+
+        private void btnSendPing_Click(object sender, EventArgs e)
+        {
+            Log("Sending 'ping'...\r\n");
+            string response = _client.Ping();
+            Log("... sent\r\n");
+
+            Log($"Received '{response}' response\r\n");
+        }
     }
 }
