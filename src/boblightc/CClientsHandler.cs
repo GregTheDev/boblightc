@@ -201,9 +201,61 @@ namespace boblightc
             }
             else if (messagekey == "ping")
             {
+                Util.Log($"{client.m_socket.Address}:{client.m_socket.Port} said ping");
+
                 return SendPing(client);
             }
+            else if (messagekey == "get")
+            {
+                Util.Log($"{client.m_socket.Address}:{client.m_socket.Port} said get");
 
+                return ParseGet(client, message);
+            }
+
+            return true;
+        }
+
+        private bool ParseGet(CClient client, CMessage message)
+        {
+            CTcpData data = new CTcpData();
+            string messagekey;
+            if (!Util.GetWord(ref message.message, out messagekey))
+            {
+                Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                return false;
+            }
+
+            if (messagekey == "version")
+            {
+                return SendVersion(client);
+            }
+            else if (messagekey == "lights")
+            {
+                return SendLights(client);
+            }
+            else
+            {
+                Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                return false;
+            }
+        }
+
+        private bool SendLights(CClient client)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool SendVersion(CClient client)
+        {
+            CTcpData data = new CTcpData();
+
+            data.SetData("version " + ProtocolVersion.Version + "\n");
+
+            if (client.m_socket.Write(data) != true)
+            {
+                Util.Log(client.m_socket.GetError());
+                return false;
+            }
             return true;
         }
 

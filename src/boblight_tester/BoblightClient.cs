@@ -50,6 +50,11 @@ namespace boblight_tester
             return SendAndReceive("ping");
         }
 
+        internal string GetVersion()
+        {
+            return SendAndReceive("get version");
+        }
+
         private string SendAndReceive(string commandName)
         {
             _socket.Send(Encoding.ASCII.GetBytes($"{commandName}\n"));
@@ -61,7 +66,6 @@ namespace boblight_tester
 
             return response;
         }
-
 
         public void Close()
         {

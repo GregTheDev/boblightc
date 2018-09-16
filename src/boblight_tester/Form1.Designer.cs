@@ -37,6 +37,7 @@
             this.txtLog = new System.Windows.Forms.TextBox();
             this.btnSendHello = new System.Windows.Forms.Button();
             this.btnSendPing = new System.Windows.Forms.Button();
+            this.btnSendGetVersion = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtServerIp
@@ -121,11 +122,22 @@
             this.btnSendPing.UseVisualStyleBackColor = true;
             this.btnSendPing.Click += new System.EventHandler(this.btnSendPing_Click);
             // 
+            // btnSendGetVersion
+            // 
+            this.btnSendGetVersion.Location = new System.Drawing.Point(15, 142);
+            this.btnSendGetVersion.Name = "btnSendGetVersion";
+            this.btnSendGetVersion.Size = new System.Drawing.Size(129, 23);
+            this.btnSendGetVersion.TabIndex = 9;
+            this.btnSendGetVersion.Text = "Send \"get version\"";
+            this.btnSendGetVersion.UseVisualStyleBackColor = true;
+            this.btnSendGetVersion.Click += new System.EventHandler(this.btnSendGetVersion_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnSendGetVersion);
             this.Controls.Add(this.btnSendPing);
             this.Controls.Add(this.btnSendHello);
             this.Controls.Add(this.txtLog);
@@ -154,6 +166,7 @@
         private System.Windows.Forms.TextBox txtLog;
         private System.Windows.Forms.Button btnSendHello;
         private System.Windows.Forms.Button btnSendPing;
+        private System.Windows.Forms.Button btnSendGetVersion;
     }
 }
 
