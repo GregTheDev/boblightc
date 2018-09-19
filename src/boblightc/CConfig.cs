@@ -250,11 +250,9 @@ namespace boblightc
 
         private bool BuildLightConfig(List<CLight> lights, List<CDevice> devices, List<CColor> colors)
         {
-            CLight globallight = new CLight(); //TOD: "default values" ???
-
             for (int i = 0; i < m_lightlines.Count; i++)
             {
-                CLight light = globallight;
+                CLight light = new CLight();
 
                 if (!SetLightName(light, m_lightlines[i].lines, i))
                     return false;
