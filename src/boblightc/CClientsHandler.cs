@@ -242,7 +242,29 @@ namespace boblightc
 
         private bool SendLights(CClient client)
         {
-            throw new NotImplementedException();
+            CTcpData data = new CTcpData();
+
+            //build up messages by appending to CTcpData
+            data.SetData("lights " + client.m_lights.Count + "\n");
+
+            for (int i = 0; i < client.m_lights.Count; i++)
+            {
+                data.SetData("light " + client.m_lights[i].Name + " ", true);
+
+                data.SetData("scan ", true);
+                data.SetData(client.m_lights[i].GetVscan()[0].ToString() + " ", true);
+                data.SetData(client.m_lights[i].GetVscan()[1].ToString() + " ", true);
+                data.SetData(client.m_lights[i].GetHscan()[0].ToString() + " ", true);
+                data.SetData(client.m_lights[i].GetHscan()[1].ToString(), true);
+                data.SetData("\n", true);
+            }
+
+            if (client.m_socket.Write(data) != true)
+            {
+                Util.Log(client.m_socket.GetError());
+                return false;
+            }
+            return true;
         }
 
         private bool SendVersion(CClient client)
@@ -290,7 +312,20 @@ namespace boblightc
 
         private void RemoveClient(CClient client)
         {
-            throw new NotImplementedException();
+            lock (m_mutex)
+            {
+                //TODO: can use linq to remove the for loop/if statement
+                for (int i = 0; i < m_clients.Count; i++)
+                {
+                    if (m_clients[i].m_socket.GetSock() == client.m_socket.GetSock())
+                    {
+                        Util.Log($"removing {m_clients[i].m_socket.Address}:{m_clients[i].m_socket.Port}");
+                        m_clients[i].Dispose();
+                        m_clients.RemoveAt(i);
+                        return;
+                    }
+                }
+            }
         }
 
         private CClient GetClientFromSock(Socket sock)

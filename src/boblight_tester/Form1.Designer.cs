@@ -38,6 +38,7 @@
             this.btnSendHello = new System.Windows.Forms.Button();
             this.btnSendPing = new System.Windows.Forms.Button();
             this.btnSendGetVersion = new System.Windows.Forms.Button();
+            this.btnGetLights = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtServerIp
@@ -132,11 +133,22 @@
             this.btnSendGetVersion.UseVisualStyleBackColor = true;
             this.btnSendGetVersion.Click += new System.EventHandler(this.btnSendGetVersion_Click);
             // 
+            // btnGetLights
+            // 
+            this.btnGetLights.Location = new System.Drawing.Point(15, 171);
+            this.btnGetLights.Name = "btnGetLights";
+            this.btnGetLights.Size = new System.Drawing.Size(129, 23);
+            this.btnGetLights.TabIndex = 10;
+            this.btnGetLights.Text = "Send \"get lights\"";
+            this.btnGetLights.UseVisualStyleBackColor = true;
+            this.btnGetLights.Click += new System.EventHandler(this.btnGetLights_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnGetLights);
             this.Controls.Add(this.btnSendGetVersion);
             this.Controls.Add(this.btnSendPing);
             this.Controls.Add(this.btnSendHello);
@@ -167,6 +179,7 @@
         private System.Windows.Forms.Button btnSendHello;
         private System.Windows.Forms.Button btnSendPing;
         private System.Windows.Forms.Button btnSendGetVersion;
+        private System.Windows.Forms.Button btnGetLights;
     }
 }
 

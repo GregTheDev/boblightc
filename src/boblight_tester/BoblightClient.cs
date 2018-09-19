@@ -55,16 +55,28 @@ namespace boblight_tester
             return SendAndReceive("get version");
         }
 
+        internal string GetLights()
+        {
+            return SendAndReceive("get lights");
+        }
+
         private string SendAndReceive(string commandName)
         {
             _socket.Send(Encoding.ASCII.GetBytes($"{commandName}\n"));
 
             byte[] buffer = new byte[1024];
-            int receivedBytes = _socket.Receive(buffer);
+            int receivedBytes = 0;
+            StringBuilder response = new StringBuilder();
 
-            string response = Encoding.ASCII.GetString(buffer, 0, receivedBytes);
+            do
+            {
+                receivedBytes = _socket.Receive(buffer);
+                response.Append(Encoding.ASCII.GetString(buffer, 0, receivedBytes));
 
-            return response;
+            }
+            while (receivedBytes == buffer.Length);
+
+            return response.ToString();
         }
 
         public void Close()

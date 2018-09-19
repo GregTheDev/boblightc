@@ -60,5 +60,14 @@ namespace boblight_tester
 
             Log($"Received '{response}' response\r\n");
         }
+
+        private void btnGetLights_Click(object sender, EventArgs e)
+        {
+            Log("Sending 'get version'...");
+            string response = _client.GetLights();
+            Log(" sent\r\n");
+
+            Log(response.Replace("\n", "\r\n"));
+        }
     }
 }

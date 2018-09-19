@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace boblightc
 {
-    internal class CClient
+    internal class CClient : IDisposable
     {
         public CTcpClientSocket m_socket;       //tcp socket for the client
         public CMessageQueue m_messagequeue;
@@ -19,11 +19,6 @@ namespace boblightc
             m_messagequeue = new CMessageQueue();
         }
 
-        internal void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
         internal void InitLights(List<CLight> lights)
         {
             m_lights = lights;
@@ -31,6 +26,11 @@ namespace boblightc
             //generate a tree for fast lightname->lightnr conversion
             for (int i = 0; i < m_lights.Count; i++)
                 m_lightnrs[m_lights[i].Name] = i;
+        }
+
+        public void Dispose()
+        {
+            m_socket.Dispose();
         }
     }
 }
