@@ -211,8 +211,54 @@ namespace boblightc
 
                 return ParseGet(client, message);
             }
+            else if (messagekey == "set")
+            {
+                return ParseSet(client, message);
+            }
 
             return true;
+        }
+
+        private bool ParseSet(CClient client, CMessage message)
+        {
+            string messagekey;
+            if (!Util.GetWord(ref message.message, out messagekey))
+            {
+                Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                return false;
+            }
+
+            if (messagekey == "priority")
+            {
+                int priority;
+                string strpriority;
+                if (!Util.GetWord(ref message.message, out strpriority) || !int.TryParse(strpriority, out priority))
+                {
+                    Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                    return false;
+                }
+                lock (m_mutex)
+                {
+                    client.SetPriority(priority);
+                }
+
+                Util.Log($"{client.m_socket.Address}:{client.m_socket.Port} priority set to {client.m_priority}");
+            }
+            else if (messagekey == "light")
+            {
+                return ParseSetLight(client, message);
+            }
+            else
+            {
+                Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                return false;
+            }
+            return true;
+        }
+
+        private bool ParseSetLight(CClient client, CMessage message)
+        {
+            throw new NotImplementedException();
         }
 
         private bool ParseGet(CClient client, CMessage message)

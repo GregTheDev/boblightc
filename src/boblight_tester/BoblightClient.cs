@@ -60,6 +60,11 @@ namespace boblight_tester
             return SendAndReceive("get lights");
         }
 
+        internal string SetPriority(int priority)
+        {
+            return SendAndReceive($"set priority {priority}");
+        }
+
         private string SendAndReceive(string commandName)
         {
             _socket.Send(Encoding.ASCII.GetBytes($"{commandName}\n"));

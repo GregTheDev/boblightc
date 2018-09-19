@@ -39,6 +39,8 @@
             this.btnSendPing = new System.Windows.Forms.Button();
             this.btnSendGetVersion = new System.Windows.Forms.Button();
             this.btnGetLights = new System.Windows.Forms.Button();
+            this.btnSendSetPriority = new System.Windows.Forms.Button();
+            this.txtPriority = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // txtServerIp
@@ -96,11 +98,11 @@
             // 
             // txtLog
             // 
-            this.txtLog.Location = new System.Drawing.Point(213, 86);
+            this.txtLog.Location = new System.Drawing.Point(308, 86);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtLog.Size = new System.Drawing.Size(575, 352);
+            this.txtLog.Size = new System.Drawing.Size(480, 352);
             this.txtLog.TabIndex = 6;
             // 
             // btnSendHello
@@ -143,11 +145,32 @@
             this.btnGetLights.UseVisualStyleBackColor = true;
             this.btnGetLights.Click += new System.EventHandler(this.btnGetLights_Click);
             // 
+            // btnSendSetPriority
+            // 
+            this.btnSendSetPriority.Location = new System.Drawing.Point(15, 200);
+            this.btnSendSetPriority.Name = "btnSendSetPriority";
+            this.btnSendSetPriority.Size = new System.Drawing.Size(129, 23);
+            this.btnSendSetPriority.TabIndex = 11;
+            this.btnSendSetPriority.Text = "Send \"set priority\"";
+            this.btnSendSetPriority.UseVisualStyleBackColor = true;
+            this.btnSendSetPriority.Click += new System.EventHandler(this.btnSendSetPriority_Click);
+            // 
+            // txtPriority
+            // 
+            this.txtPriority.Location = new System.Drawing.Point(150, 201);
+            this.txtPriority.Name = "txtPriority";
+            this.txtPriority.Size = new System.Drawing.Size(100, 22);
+            this.txtPriority.TabIndex = 12;
+            this.txtPriority.Text = "1";
+            this.txtPriority.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.txtPriority);
+            this.Controls.Add(this.btnSendSetPriority);
             this.Controls.Add(this.btnGetLights);
             this.Controls.Add(this.btnSendGetVersion);
             this.Controls.Add(this.btnSendPing);
@@ -180,6 +203,8 @@
         private System.Windows.Forms.Button btnSendPing;
         private System.Windows.Forms.Button btnSendGetVersion;
         private System.Windows.Forms.Button btnGetLights;
+        private System.Windows.Forms.Button btnSendSetPriority;
+        private System.Windows.Forms.TextBox txtPriority;
     }
 }
 

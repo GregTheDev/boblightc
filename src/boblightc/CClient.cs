@@ -11,6 +11,7 @@ namespace boblightc
         internal long m_connecttime;
         internal List<CLight> m_lights;
         private Dictionary<string, int> m_lightnrs;
+        internal object m_priority;
 
         public CClient()
         {
@@ -31,6 +32,11 @@ namespace boblightc
         public void Dispose()
         {
             m_socket.Dispose();
+        }
+
+        internal void SetPriority(int priority)
+        {
+            m_priority = Math.Clamp(priority, 0, 255);
         }
     }
 }

@@ -69,5 +69,14 @@ namespace boblight_tester
 
             Log(response.Replace("\n", "\r\n"));
         }
+
+        private void btnSendSetPriority_Click(object sender, EventArgs e)
+        {
+            Log("Sending 'set priority'...");
+            string response = _client.SetPriority(int.Parse(txtPriority.Text));
+            Log(" sent\r\n");
+
+            Log(response.Replace("\n", "\r\n"));
+        }
     }
 }
