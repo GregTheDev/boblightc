@@ -38,5 +38,13 @@ namespace boblightc
         {
             m_priority = Math.Clamp(priority, 0, 255);
         }
+
+        internal int LightNameToInt(string lightname)
+        {
+            if (!m_lightnrs.ContainsKey(lightname))
+                return -1;
+            else
+                return m_lightnrs[lightname];
+        }
     }
 }

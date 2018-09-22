@@ -12,7 +12,7 @@ namespace boblightc
         private long m_prevtime;
         private float[] m_rgb = new float[3];
         private float[] m_prevrgb =  new float[3];
-        private double m_speed;
+        private float m_speed;
         private bool m_use;
         private bool m_interpolation;
 
@@ -33,7 +33,7 @@ namespace boblightc
                 m_prevrgb[i] = 0.0f;
             }
 
-            m_speed = 100.0;
+            m_speed = 100.0f;
             m_use = true;
             m_interpolation = false;
 
@@ -71,6 +71,42 @@ namespace boblightc
         internal float[] GetHscan()
         {
             return m_hscan;
+        }
+
+        internal void SetRgb(float[] rgb, long time)
+        {
+            for (int i = 0; i < 3; i++)
+                rgb[i] = Math.Clamp(rgb[i], 0.0f, 1.0f);
+
+            m_prevrgb = (float[]) m_rgb.Clone();
+            m_rgb = (float[]) rgb.Clone();
+
+            m_prevtime = m_time;
+            m_time = time;
+        }
+
+        internal void SetSpeed(float speed)
+        {
+            m_speed = Math.Clamp(speed, 0.0f, 100.0f);
+        }
+
+        internal void SetInterpolation(bool interpolation)
+        {
+            m_interpolation = interpolation;
+        }
+
+        internal void SetUse(bool use)
+        {
+            m_use = use;
+        }
+
+        internal void SetSingleChange(float singlechange)
+        {
+            foreach (var key in m_users.Keys)
+                m_users[key] = Math.Clamp(singlechange, 0.0f, 1.0f);
+
+            //for (uint i = 0; i < m_users.Count; i++)
+            //    m_users.[i].second = Math.Clamp(singlechange, 0.0, 1.0);
         }
     }
 }

@@ -77,5 +77,13 @@ namespace boblightc
             value.Replace(",", localDecimalSeperator);
             value.Replace(".", localDecimalSeperator);
         }
+
+        internal static void ConvertYesNoToTrueFalse(ref string value)
+        {
+            value.Replace("y", "true", StringComparison.InvariantCultureIgnoreCase);
+            value.Replace("n", "false", StringComparison.InvariantCultureIgnoreCase);
+            value.Replace("yes", "true", StringComparison.InvariantCultureIgnoreCase);
+            value.Replace("no", "false", StringComparison.InvariantCultureIgnoreCase);
+        }
     }
 }

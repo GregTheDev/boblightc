@@ -258,7 +258,114 @@ namespace boblightc
 
         private bool ParseSetLight(CClient client, CMessage message)
         {
-            throw new NotImplementedException();
+            string lightname;
+            string lightkey;
+            int lightnr;
+
+            if (!Util.GetWord(ref message.message, out lightname) || !Util.GetWord(ref message.message, out lightkey) || (lightnr = client.LightNameToInt(lightname)) == -1)
+            {
+                Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                return false;
+            }
+
+            if (lightkey == "rgb")
+            {
+                float[] rgb = new float[3];
+                string value;
+
+                Util.ConvertFloatLocale(ref message.message); //workaround for locale mismatch (, and .)
+
+                for (int i = 0; i < 3; i++)
+                {
+                    if (!Util.GetWord(ref message.message, out value) || !float.TryParse(value, out rgb[i]))
+                    {
+                        Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                        return false;
+                    }
+                }
+
+                lock (m_mutex)
+                {
+                    client.m_lights[lightnr].SetRgb(rgb, message.time);
+                }
+            }
+            else if (lightkey == "speed")
+            {
+                float speed;
+                string value;
+
+                Util.ConvertFloatLocale(ref message.message); //workaround for locale mismatch (, and .)
+
+                if (!Util.GetWord(ref message.message, out value) || !float.TryParse(value, out speed))
+                {
+                    Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                    return false;
+                }
+
+                lock (m_mutex)
+                {
+                    client.m_lights[lightnr].SetSpeed(speed);
+                }
+            }
+            else if (lightkey == "interpolation")
+            {
+                bool interpolation;
+                string value;
+
+                //TODO: check for true/false vs y/n
+                if (!Util.GetWord(ref message.message, out value) || !bool.TryParse(value, out interpolation))
+                {
+                    Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                    return false;
+                }
+
+                lock (m_mutex)
+                {
+                    client.m_lights[lightnr].SetInterpolation(interpolation);
+                }
+            }
+            else if (lightkey == "use")
+            {
+                bool use;
+                string value;
+
+                //TODO: check for true/false vs y/n
+                if (!Util.GetWord(ref message.message, out value) || !bool.TryParse(value, out use))
+                {
+                    Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                    return false;
+                }
+
+                lock (m_mutex)
+                {
+                    client.m_lights[lightnr].SetUse(use);
+                }
+            }
+            else if (lightkey == "singlechange")
+            {
+                float singlechange;
+                string value;
+
+                Util.ConvertFloatLocale(ref message.message); //workaround for locale mismatch (, and .)
+
+                if (!Util.GetWord(ref message.message, out value) || !float.TryParse(value, out singlechange))
+                {
+                    Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                    return false;
+                }
+
+                lock (m_mutex)
+                {
+                    client.m_lights[lightnr].SetSingleChange(singlechange);
+                }
+            }
+            else
+            {
+                Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                return false;
+            }
+
+            return true;
         }
 
         private bool ParseGet(CClient client, CMessage message)

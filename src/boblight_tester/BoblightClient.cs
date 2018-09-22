@@ -65,6 +65,36 @@ namespace boblight_tester
             return SendAndReceive($"set priority {priority}");
         }
 
+        internal void SetLightRgb(string lightName, float r, float g, float b)
+        {
+            Send($"set light {lightName} rgb {r} {g} {b}");
+        }
+
+        internal void SetLightSpeed(string lightName, float speed)
+        {
+            Send($"set light {lightName} speed {speed}");
+        }
+
+        internal void SetLightInterpolation(string lightName, bool interpolation)
+        {
+            Send($"set light {lightName} interpolation {interpolation}");
+        }
+
+        internal void SetLightUse(string lightName, bool use)
+        {
+            Send($"set light {lightName} use {use}");
+        }
+
+        internal void SetLightSingleChange(string lightName, float singleChange)
+        {
+            Send($"set light {lightName} singlechange {singleChange}");
+        }
+
+        private void Send(string command)
+        {
+            _socket.Send(Encoding.ASCII.GetBytes($"{command}\n"));
+        }
+
         private string SendAndReceive(string commandName)
         {
             _socket.Send(Encoding.ASCII.GetBytes($"{commandName}\n"));

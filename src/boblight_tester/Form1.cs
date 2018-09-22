@@ -78,5 +78,54 @@ namespace boblight_tester
 
             Log(response.Replace("\n", "\r\n"));
         }
+
+        private void btnSetLightRgb_Click(object sender, EventArgs e)
+        {
+            string[] rgbPieces = txtSetRgbRgb.Text.Split(',');
+
+            Log("Sending 'set light rgb'...");
+            _client.SetLightRgb(txtSetRgbLightName.Text, 
+                float.Parse(rgbPieces[0]), 
+                float.Parse(rgbPieces[1]), 
+                float.Parse(rgbPieces[2]));
+
+            Log(" sent\r\n");
+        }
+
+        private void btnSetLightSpeed_Click(object sender, EventArgs e)
+        {
+            Log("Sending 'set light speed'...");
+            _client.SetLightSpeed(txtSetSpeedLightName.Text,
+                float.Parse(txtSetSpeedSpeed.Text));
+
+            Log(" sent\r\n");
+        }
+
+        private void btnSetLIghtInterpolation_Click(object sender, EventArgs e)
+        {
+            Log("Sending 'set light interpolation'...");
+            _client.SetLightInterpolation(txtSetInterpolationName.Text,
+                bool.Parse(txtSetInterpolation.Text));
+
+            Log(" sent\r\n");
+        }
+
+        private void btnSetUse_Click(object sender, EventArgs e)
+        {
+            Log("Sending 'set light use'...");
+            _client.SetLightUse(txtSetUseLightName.Text,
+                bool.Parse(txtSetUse.Text));
+
+            Log(" sent\r\n");
+        }
+
+        private void btnSetSingleChange_Click(object sender, EventArgs e)
+        {
+            Log("Sending 'set light singlechange'...");
+            _client.SetLightSingleChange(txtSetSingleChangeLightName.Text,
+                float.Parse(txtSetSingleChangeValue.Text));
+
+            Log(" sent\r\n");
+        }
     }
 }
