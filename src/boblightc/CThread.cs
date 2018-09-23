@@ -3,28 +3,79 @@ using System.Threading;
 
 namespace boblightc
 {
-    internal abstract class CThread
+    internal abstract class CThread : IDisposable
     {
+        bool disposed = false;
+
         protected Thread m_thread;
         //protected volatile bool m_stop;
         protected ManualResetEvent m_stop;
         protected volatile bool m_running;
 
-        public abstract void Process();
+        public virtual void Process() { }
 
         protected CThread()
         {
+            m_thread = null;
+            m_running = false;
+
             m_stop = new ManualResetEvent(false);
         }
 
         internal void StartThread()
         {
-            throw new NotImplementedException();
+            m_running = true;
+            m_thread = new Thread(new ThreadStart(ThreadFunction));
+            m_thread.Start();
+        }
 
-            //m_stop = false;
-            //m_running = true;
-            //pthread_create(&m_thread, NULL, ThreadFunction, reinterpret_cast<void*>(this));
+        private void ThreadFunction()
+        {
+            Process();
+            m_running = false;
+        }
 
+        private void StopThread()
+        {
+            AsyncStopThread();
+            JoinThread();
+        }
+
+        private void AsyncStopThread()
+        {
+            m_stop.Set();
+        }
+
+        private void JoinThread()
+        {
+            if (m_thread != null)
+            {
+                m_thread.Join();
+                m_thread = null;
+            }
+        }
+
+        // Public implementation of Dispose pattern callable by consumers.
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+            {
+                StopThread();
+                // Free any other managed objects here.
+                //
+            }
+
+            disposed = true;
         }
     }
 }
