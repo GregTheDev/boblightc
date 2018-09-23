@@ -10,6 +10,7 @@ namespace boblightc
     internal class Util
     {
         private static ILog _logger;
+        private static DateTime UnixEpoch = new DateTime(1970, 1, 1);
 
         static Util()
         {
@@ -84,6 +85,14 @@ namespace boblightc
             value.Replace("n", "false", StringComparison.InvariantCultureIgnoreCase);
             value.Replace("yes", "true", StringComparison.InvariantCultureIgnoreCase);
             value.Replace("no", "false", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        internal static long GetTimeUs()
+        {
+            // From: https://stackoverflow.com/questions/4856659/is-there-an-equivalent-of-gettimeofday-in-net
+            TimeSpan timeSinceEpoch = DateTime.UtcNow - UnixEpoch;
+
+            return timeSinceEpoch.Ticks / 10; // Tick is 100ns
         }
     }
 }
