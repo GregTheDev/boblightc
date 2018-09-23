@@ -215,6 +215,39 @@ namespace boblightc
             {
                 return ParseSet(client, message);
             }
+            else if (messagekey == "sync")
+            {
+                return ParseSync(client);
+            }
+            else
+            {
+                Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool ParseSync(CClient client)
+        {
+            List<CDevice> users = new List<CDevice>();
+
+            lock (m_mutex)
+            {
+                //build up a list of devices using this client's input
+                for (int i = 0; i < client.m_lights.Count; i++)
+                {
+                    users.AddRange(client.m_lights[i].GetAllUsers());
+                    //for (int j = 0; j < client.m_lights[i].GetNrUsers(); j++)
+                    //    users.Add(client.m_lights[i].GetUser(j));
+                }
+            }
+
+            var distinctUsers = users.Distinct();
+
+            //message all devices
+            foreach (CDevice device in distinctUsers)
+                device.Sync();
 
             return true;
         }

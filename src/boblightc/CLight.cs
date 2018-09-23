@@ -108,5 +108,16 @@ namespace boblightc
             //for (uint i = 0; i < m_users.Count; i++)
             //    m_users.[i].second = Math.Clamp(singlechange, 0.0, 1.0);
         }
+
+        internal CDevice GetUser(int j)
+        {
+            //GN: Created a new GetAllUsers function
+            throw new NotImplementedException();
+        }
+
+        internal IEnumerable<CDevice> GetAllUsers()
+        {
+            return m_users.Keys;
+        }
     }
 }

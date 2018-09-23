@@ -1,4 +1,6 @@
-﻿namespace boblightc
+﻿using System;
+
+namespace boblightc
 {
     internal class CDeviceRS232 : CDevice
     {
@@ -8,6 +10,14 @@
             : base()
         {
             this.clients = clients;
+        }
+
+        internal override void Sync()
+        {
+            //if (m_allowsync)
+            //    m_timer.Signal();
+
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -90,6 +90,11 @@ namespace boblight_tester
             Send($"set light {lightName} singlechange {singleChange}");
         }
 
+        internal void Sync()
+        {
+            Send($"sync");
+        }
+
         private void Send(string command)
         {
             _socket.Send(Encoding.ASCII.GetBytes($"{command}\n"));

@@ -169,9 +169,10 @@ namespace boblightc
 
             if (disposing)
             {
-
                 // Free any other managed objects here.
                 Close();
+
+                m_sock.Dispose();
             }
 
             disposed = true;

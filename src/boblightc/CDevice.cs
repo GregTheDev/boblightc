@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace boblightc
 {
-    internal class CDevice : CThread
+    internal abstract class CDevice : CThread
     {
         public const int NOTHING = 0;
         public const int MOMO = 1;
@@ -47,5 +47,7 @@ namespace boblightc
         {
             m_channels[channelnr] = channel;
         }
+
+        internal abstract void Sync();
     }
 }

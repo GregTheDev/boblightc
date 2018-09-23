@@ -127,5 +127,13 @@ namespace boblight_tester
 
             Log(" sent\r\n");
         }
+
+        private void btnSendSync_Click(object sender, EventArgs e)
+        {
+            Log("Sending 'sync'...");
+            _client.Sync();
+
+            Log(" sent\r\n");
+        }
     }
 }

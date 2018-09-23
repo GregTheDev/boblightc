@@ -56,6 +56,7 @@
             this.txtSetSingleChangeValue = new System.Windows.Forms.TextBox();
             this.txtSetSingleChangeLightName = new System.Windows.Forms.TextBox();
             this.btnSetSingleChange = new System.Windows.Forms.Button();
+            this.btnSendSync = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtServerIp
@@ -319,11 +320,22 @@
             this.btnSetSingleChange.UseVisualStyleBackColor = true;
             this.btnSetSingleChange.Click += new System.EventHandler(this.btnSetSingleChange_Click);
             // 
+            // btnSendSync
+            // 
+            this.btnSendSync.Location = new System.Drawing.Point(15, 374);
+            this.btnSendSync.Name = "btnSendSync";
+            this.btnSendSync.Size = new System.Drawing.Size(178, 23);
+            this.btnSendSync.TabIndex = 28;
+            this.btnSendSync.Text = "Send \"sync\"";
+            this.btnSendSync.UseVisualStyleBackColor = true;
+            this.btnSendSync.Click += new System.EventHandler(this.btnSendSync_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnSendSync);
             this.Controls.Add(this.txtSetSingleChangeValue);
             this.Controls.Add(this.txtSetSingleChangeLightName);
             this.Controls.Add(this.btnSetSingleChange);
@@ -390,6 +402,7 @@
         private System.Windows.Forms.TextBox txtSetSingleChangeValue;
         private System.Windows.Forms.TextBox txtSetSingleChangeLightName;
         private System.Windows.Forms.Button btnSetSingleChange;
+        private System.Windows.Forms.Button btnSendSync;
     }
 }
 
