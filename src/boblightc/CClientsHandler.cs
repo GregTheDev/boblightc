@@ -134,6 +134,100 @@ namespace boblightc
             return waitsockets;
         }
 
+        public void FillChannels(List<CChannel> channels, long time, CDevice device)
+        {
+            List<CLight> usedlights = new List<CLight>();
+
+            lock (m_mutex)
+            {
+
+                //get the oldest client with the highest priority
+                for (int i = 0; i < channels.Count; i++)
+                {
+                    long clienttime = 0x7fffffffffffffff;
+                    int priority = 255;
+                    int light = channels[i].Light;
+                    int color = channels[i].Color;
+                    int clientnr = -1;
+
+                    if (light == -1 || color == -1) //unused channel
+                        continue;
+
+                    for (int j = 0; j < m_clients.Count; j++)
+                    {
+                        if (m_clients[j].m_priority == 255 || m_clients[j].m_connecttime == -1 || !m_clients[j].m_lights[light].GetUse())
+                            continue; //this client we don't use
+
+                        //this client has a high priority (lower number) than the current one, or has the same and is older
+                        if (m_clients[j].m_priority < priority || (priority == m_clients[j].m_priority && m_clients[j].m_connecttime < clienttime))
+                        {
+                            clientnr = j;
+                            clienttime = m_clients[j].m_connecttime;
+                            priority = m_clients[j].m_priority;
+                        }
+                    }
+
+                    if (clientnr == -1) //no client for the light on this channel
+                    {
+                        channels[i].m_isused = false;
+                        channels[i].SetSpeed(m_lights[light].GetSpeed());
+                        channels[i].SetValueToFallback();
+                        channels[i].SetGamma(1.0f);
+                        channels[i].SetAdjust(1.0f);
+                        channels[i].SetBlacklevel(0.0f);
+                        continue;
+                    }
+
+                    //fill channel with values from the client
+                    channels[i].SetUsed(true);
+                    channels[i].SetValue(m_clients[clientnr].m_lights[light].GetColorValue(color, time));
+                    channels[i].SetSpeed(m_clients[clientnr].m_lights[light].GetSpeed());
+                    channels[i].SetGamma(m_clients[clientnr].m_lights[light].GetGamma(color));
+                    channels[i].SetAdjust(m_clients[clientnr].m_lights[light].GetAdjust(color));
+                    channels[i].SetBlacklevel(m_clients[clientnr].m_lights[light].GetBlacklevel(color));
+                    channels[i].SetSingleChange(m_clients[clientnr].m_lights[light].GetSingleChange(device));
+
+                    //save pointer to this light because we have to reset the singlechange later
+                    //more than one channel can use a light so can't do this from the loop
+                    usedlights.Add(m_clients[clientnr].m_lights[light]);
+                }
+
+                //remove duplicate lights
+                //usedlights.sort();
+                //usedlights.unique();
+
+                //reset singlechange
+                foreach (var usedLight in usedlights.Distinct())
+                    usedLight.ResetSingleChange(device);
+
+
+                //for (list<CLight*>::iterator it = usedlights.begin(); it != usedlights.end(); it++)
+                //    (*it)->ResetSingleChange(device);
+
+                //update which lights we're using
+                for (int i = 0; i < m_clients.Count; i++)
+                {
+                    for (int j = 0; j < m_clients[i].m_lights.Count; j++)
+                    {
+                        bool lightused = false;
+                        foreach (CLight it in usedlights)// list<CLight*>::iterator it = usedlights.begin(); it != usedlights.end(); it++)
+                        {
+                            if (it == m_clients[i].m_lights[j])
+                            {
+                                lightused = true;
+                                break;
+                            }
+                        }
+
+                        if (lightused)
+                            m_clients[i].m_lights[j].AddUser(device);
+                        else
+                            m_clients[i].m_lights[j].ClearUser(device);
+                    }
+                }
+            }
+        }
+
         internal void Cleanup()
         {
             //kick off all clients

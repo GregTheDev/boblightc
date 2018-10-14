@@ -217,21 +217,21 @@ namespace boblightc
                         float gamma;
                         Util.ConvertFloatLocale(ref value);
                         gamma = float.Parse(value);
-                        color.Gamma = gamma;
+                        color.m_gamma = gamma;
                     }
                     else if (key == "adjust")
                     {
                         float adjust;
                         Util.ConvertFloatLocale(ref value);
                         adjust = float.Parse(value);
-                        color.Adjust = adjust;
+                        color.m_adjust = adjust;
                     }
                     else if (key == "blacklevel")
                     {
                         float blacklevel;
                         Util.ConvertFloatLocale(ref value);
                         blacklevel = float.Parse(value);
-                        color.Blacklevel = blacklevel;
+                        color.m_blacklevel = blacklevel;
                     }
                 }
 
@@ -689,7 +689,7 @@ namespace boblightc
         private void SetDevicePrefix(CDevice device, int devicenr)
         {
             string line, strvalue;
-            List<int> prefix = new List<int>(); //TODO, confirm size of type uint8_t
+            List<byte> prefix = new List<byte>();
             int linenr = GetLineWithKey("prefix", m_devicelines[devicenr].lines, out line);
             if (linenr == -1)
             {
@@ -698,17 +698,17 @@ namespace boblightc
 
             while (Util.GetWord(ref line, out strvalue))
             {
-                int iprefix;
-                iprefix = int.Parse(strvalue, NumberStyles.HexNumber, null);
+                byte iprefix;
+                iprefix = byte.Parse(strvalue, NumberStyles.HexNumber, null);
                 prefix.Add(iprefix);
             }
-            device.Prefix = prefix;
+            device.m_prefix = prefix;
         }
 
         private void SetDevicePostfix(CDevice device, int devicenr)
         {
             string line, strvalue;
-            List<int> postfix = new List<int>(); //TODO, confirm size of type uint8_t
+            List<byte> postfix = new List<byte>(); //TODO, confirm size of type uint8_t
             int linenr = GetLineWithKey("postfix", m_devicelines[devicenr].lines, out line);
             if (linenr == -1)
             {
@@ -717,11 +717,11 @@ namespace boblightc
 
             while (Util.GetWord(ref line, out strvalue))
             {
-                int ipostfix;
-                ipostfix = int.Parse(strvalue, NumberStyles.HexNumber, null);
+                byte ipostfix;
+                ipostfix = byte.Parse(strvalue, NumberStyles.HexNumber, null);
                 postfix.Add(ipostfix);
             }
-            device.Postfix = postfix;
+            device.m_postfix = postfix;
         }
 
         private void SetDeviceAllowSync(CDevice device, int devicenr)
@@ -748,8 +748,7 @@ namespace boblightc
             Util.GetWord(ref line, out strvalue);
 
             // Port: seems some versions of config file allow for on/off and other true/false
-            if (strvalue == "off") strvalue = "false";
-            if (strvalue == "on") strvalue = "true";
+            Util.ConvertYesNoOnOffToTrueFalse(ref strvalue);
 
             bool debug;
             debug = bool.Parse(strvalue);
@@ -767,7 +766,7 @@ namespace boblightc
 
             int bits;
             bits = int.Parse(strvalue);
-            device.Max = (1 << bits) - 1; //TODO: verify ((1 << (int64_t)bits) - 1);
+            device.m_max = (1 << bits) - 1; //TODO: verify ((1 << (int64_t)bits) - 1);
 
             return true;
         }
@@ -783,7 +782,7 @@ namespace boblightc
 
             Int64 max;
             max = Int64.Parse(strvalue);
-            device.Max = max;
+            device.m_max = max;
 
             return true;
         }

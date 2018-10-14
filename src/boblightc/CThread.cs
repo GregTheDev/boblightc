@@ -35,13 +35,13 @@ namespace boblightc
             m_running = false;
         }
 
-        private void StopThread()
+        public void StopThread()
         {
             AsyncStopThread();
             JoinThread();
         }
 
-        private void AsyncStopThread()
+        public void AsyncStopThread()
         {
             m_stop.Set();
         }

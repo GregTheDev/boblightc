@@ -57,28 +57,29 @@ namespace boblightc
 
             //start the devices
             Util.Log("starting devices");
-            //for (int i = 0; i < devices.Count; i++)
-            //    devices[i].StartThread();
+            for (int i = 0; i < devices.Count; i++)
+                devices[i].StartThread();
 
             //run the clients handler
             _stopEvent = new ManualResetEvent(false);
 
             Console.CancelKeyPress += Console_CancelKeyPress;
             while (!_stopEvent.WaitOne(0))
-                clients.Process();
+                Thread.Sleep(30 * 1000);
+                //clients.Process();
 
             //signal that the devices should stop
-            //Log("signaling devices to stop");
-            //for (int i = 0; i < devices.size(); i++)
-            //    devices[i]->AsyncStopThread();
+            Util.Log("signaling devices to stop");
+            for (int i = 0; i < devices.Count; i++)
+                devices[i].AsyncStopThread();
 
             //clean up the clients handler
             clients.Cleanup();
 
             //stop the devices
-            //Log("waiting for devices to stop");
-            //for (int i = 0; i < devices.size(); i++)
-            //    devices[i]->StopThread();
+            Util.Log("waiting for devices to stop");
+            for (int i = 0; i < devices.Count; i++)
+                devices[i].StopThread();
 
             Util.Log("exiting");
 

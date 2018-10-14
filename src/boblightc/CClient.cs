@@ -11,7 +11,7 @@ namespace boblightc
         internal long m_connecttime;
         internal List<CLight> m_lights;
         private Dictionary<string, int> m_lightnrs;
-        internal object m_priority;
+        internal int m_priority; //TODO: need to verify this
 
         public CClient()
         {

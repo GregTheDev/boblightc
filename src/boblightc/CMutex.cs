@@ -49,6 +49,7 @@ namespace boblightc
             return true;
         }
 
+        //TODO: use IDisposable
         ~CMutex()
         {
             _mutex.Dispose();

@@ -27,7 +27,7 @@ namespace boblightc
 
         internal static void Log(string message)
         {
-            _logger.Debug(message);
+            _logger.Info(message);
         }
 
         internal static bool GetWord(ref string data, out string word)
@@ -79,12 +79,19 @@ namespace boblightc
             value.Replace(".", localDecimalSeperator);
         }
 
-        internal static void ConvertYesNoToTrueFalse(ref string value)
+        internal static void Debug(string message)
         {
-            value.Replace("y", "true", StringComparison.InvariantCultureIgnoreCase);
-            value.Replace("n", "false", StringComparison.InvariantCultureIgnoreCase);
-            value.Replace("yes", "true", StringComparison.InvariantCultureIgnoreCase);
-            value.Replace("no", "false", StringComparison.InvariantCultureIgnoreCase);
+            _logger.Debug(message);
+        }
+
+        internal static void ConvertYesNoOnOffToTrueFalse(ref string value)
+        {
+            value = value.Replace("y", "true", StringComparison.InvariantCultureIgnoreCase);
+            value = value.Replace("n", "false", StringComparison.InvariantCultureIgnoreCase);
+            value = value.Replace("yes", "true", StringComparison.InvariantCultureIgnoreCase);
+            value = value.Replace("no", "false", StringComparison.InvariantCultureIgnoreCase);
+            value = value.Replace("off", "false", StringComparison.InvariantCultureIgnoreCase);
+            value = value.Replace("on", "true", StringComparison.InvariantCultureIgnoreCase);
         }
 
         internal static long GetTimeUs()

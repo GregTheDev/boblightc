@@ -25,37 +25,43 @@ namespace boblightc
         public int Type { get; internal set; }
         public string Name { get; internal set; }
         public string Output { get; internal set; }
-        public int NrChannels { get { return m_channels.Count; } internal set { m_channels.Clear(); for (int i = 0; i <= value; i++) m_channels.Add(null); }  }
+        public int NrChannels
+        {
+            get { return m_channels.Count; }
+            internal set { m_channels.Clear(); for (int i = 0; i <= value-1; i++) m_channels.Add(null); }
+        }
         public int Rate { get; internal set; }
         public int Interval { get; internal set; }
-        public List<int> Prefix { get; internal set; }
-        public List<int> Postfix { get; internal set; }
+        public List<byte> m_prefix { get; internal set; }
+        public List<byte> m_postfix { get; internal set; }
         public bool AllowSync { get; internal set; }
         public bool Debug { get; internal set; }
-        public Int64 Max { get; internal set; }
+        public Int64 m_max { get; internal set; }
         public int DelayAfterOpen { get; internal set; }
         public ThreadPriority ThreadPriority { get; internal set; }
 
-        private List<CChannel> m_channels; //TODO: array might be a better option?
-        private bool m_allowsync;
-        private bool m_debug;
-        private int m_delayafteropen;
+        protected List<CChannel> m_channels; //TODO: array might be a better option?
+        protected bool m_allowsync;
+        protected bool m_debug;
+        protected int m_delayafteropen;
         private int m_threadpriority;
         private bool m_setpriority;
-        private int m_type;
-        protected string m_output;
-        protected string m_name;
+        protected int m_type;
+        protected CClientsHandler m_clients;
 
-        public CDevice()
+        public CDevice(CClientsHandler clients)
             : base()
         {
-            m_channels = new List<CChannel>();
+            m_clients = clients;
 
+            m_channels = new List<CChannel>();
             m_allowsync = true;
             m_debug = false;
             m_delayafteropen = 0;
             m_threadpriority = -1;
             m_setpriority = false;
+            m_prefix = new List<byte>();
+            m_postfix = new List<byte>();
         }
 
         internal void SetChannel(CChannel channel, int channelnr)
@@ -67,23 +73,23 @@ namespace boblightc
 
         public override void Process()
         {
-            if (string.IsNullOrEmpty(m_output))
-                Util.Log($"{m_name}: starting");
+            if (string.IsNullOrEmpty(Output))
+                Util.Log($"{Name}: starting");
             else
-                Util.Log($"{m_name}: starting with output \"{m_output}\"");
+                Util.Log($"{Name}: starting with output \"{Output}\"");
 
             if (m_setpriority)
             {
                 //TODO: Going to have to test this... unix supports 1 (low) to 99 (high). .Net supports fixed values from 0 to 4.
                 m_thread.Priority = (ThreadPriority) m_threadpriority;
-                Util.Log($"{m_name}: successfully set thread priority to {m_threadpriority}");
+                Util.Log($"{Name}: successfully set thread priority to {m_threadpriority}");
                 //sched_param param = { };
                 //param.sched_priority = m_threadpriority;
                 //int returnv = pthread_setschedparam(m_thread, SCHED_FIFO, &param);
                 //if (returnv == 0)
-                //    Log("%s: successfully set thread priority to %i", m_name.c_str(), m_threadpriority);
+                //    Log("%s: successfully set thread priority to %i", Name.c_str(), m_threadpriority);
                 //else
-                //    LogError("%s: error setting thread priority to %i: %s", m_name.c_str(), m_threadpriority, GetErrno(returnv).c_str());
+                //    LogError("%s: error setting thread priority to %i: %s", Name.c_str(), m_threadpriority, GetErrno(returnv).c_str());
             }
 
             long setuptime = 0;
@@ -93,19 +99,19 @@ namespace boblightc
                 //keep trying to set up the device every 10 seconds
                 while (!m_stop.WaitOne(0))
                 {
-                    Util.Log($"{m_name}: setting up");
+                    Util.Log($"{Name}: setting up");
 
                     setuptime = Util.GetTimeUs();
                     if (!SetupDevice())
                     {
                         CloseDevice();
-                        Util.LogError($"{m_name}: setting up failed, retrying in 10 seconds");
+                        Util.LogError($"{Name}: setting up failed, retrying in 10 seconds");
                         m_stop.WaitOne(10 * 1000);
                         //USleep(10000000LL, &m_stop);
                     }
                     else
                     {
-                        Util.Log($"{m_name}: setup succeeded");
+                        Util.Log($"{Name}: setup succeeded");
                         break;
                     }
                 }
@@ -124,10 +130,10 @@ namespace boblightc
 
                 CloseDevice();
 
-                Util.Log($"{m_name}: closed");
+                Util.Log($"{Name}: closed");
             }
 
-            Util.Log($"{m_name}: stopped");
+            Util.Log($"{Name}: stopped");
         }
 
         protected virtual bool WriteOutput()
@@ -140,7 +146,7 @@ namespace boblightc
             return;
         }
 
-        protected bool SetupDevice()
+        protected virtual bool SetupDevice()
         {
             return false;
         }
