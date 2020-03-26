@@ -27,7 +27,6 @@ namespace boblightc
             {
                 //SetNonBlock(false);
                 m_sock.Close();
-                m_sock = null;
             }
         }
 
@@ -173,6 +172,7 @@ namespace boblightc
                 Close();
 
                 m_sock.Dispose();
+                m_sock = null;
             }
 
             disposed = true;
