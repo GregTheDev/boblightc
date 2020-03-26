@@ -16,7 +16,7 @@ namespace boblightc
         private bool m_use;
         private bool m_interpolation;
 
-        public int NrColors { get; internal set; }
+        public int NrColors { get { return m_colors.Count; } }
         public string Name { get; internal set; }
         public Dictionary<CDevice, float> m_users;
 
@@ -152,7 +152,7 @@ namespace boblightc
             }
             else
             {
-                Array.Copy(rgb, m_rgb, rgb.Length);
+                Array.Copy(m_rgb, rgb, rgb.Length);
             }
 
             if (rgb[0] == 0.0 && rgb[1] == 0.0 && rgb[2] == 0.0)

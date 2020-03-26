@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Linq;
+using System.Net.Sockets;
 
 namespace boblightc
 {
@@ -243,6 +243,8 @@ namespace boblightc
 
             Util.Log("closing listening socket");
             m_socket.Close();
+            m_socket.Dispose();
+            m_socket = null;
 
             Util.Log("clients handler stopped");
         }
