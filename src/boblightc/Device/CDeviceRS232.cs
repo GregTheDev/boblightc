@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace boblightc
+namespace boblightc.Device
 {
     internal class CDeviceRS232 : CDevice
     {

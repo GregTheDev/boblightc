@@ -1,4 +1,5 @@
-﻿using System;
+﻿using boblightc.Device;
+using System;
 using System.Collections.Generic;
 
 namespace boblightc

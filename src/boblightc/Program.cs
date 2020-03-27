@@ -1,8 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using boblightc.Device;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Threading;
 
 namespace boblightc
@@ -65,8 +66,9 @@ namespace boblightc
 
             Console.CancelKeyPress += Console_CancelKeyPress;
             while (!_stopEvent.WaitOne(0))
-                Thread.Sleep(30 * 1000);
-                //clients.Process();
+            {
+                clients.Process();
+            }
 
             //signal that the devices should stop
             Util.Log("signaling devices to stop");

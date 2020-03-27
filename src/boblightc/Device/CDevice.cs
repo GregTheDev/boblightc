@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace boblightc
+namespace boblightc.Device
 {
     internal abstract class CDevice : CThread
     {

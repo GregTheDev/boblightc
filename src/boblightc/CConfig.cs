@@ -1,4 +1,5 @@
-﻿using System;
+﻿using boblightc.Device;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -22,12 +23,17 @@ namespace boblightc
         private List<CConfigGroup> m_colorlines;
         private List<CConfigGroup> m_lightlines;
 
+        private NumberFormatInfo _configFileNumberFormat;
+
         public CConfig()
         {
             m_globalconfiglines = new List<CConfigLine>();
             m_devicelines = new List<CConfigGroup>();
             m_colorlines = new List<CConfigGroup>();
             m_lightlines = new List<CConfigGroup>();
+
+            _configFileNumberFormat = new NumberFormatInfo();
+            _configFileNumberFormat.NumberDecimalSeparator = "."; // No support for culture specific number formats in config files for now
         }
 
         public bool LoadConfigFromFile(string file)
@@ -216,21 +222,21 @@ namespace boblightc
                     {
                         float gamma;
                         Util.ConvertFloatLocale(ref value);
-                        gamma = float.Parse(value);
+                        gamma = float.Parse(value, _configFileNumberFormat);
                         color.m_gamma = gamma;
                     }
                     else if (key == "adjust")
                     {
                         float adjust;
                         Util.ConvertFloatLocale(ref value);
-                        adjust = float.Parse(value);
+                        adjust = float.Parse(value, _configFileNumberFormat);
                         color.m_adjust = adjust;
                     }
                     else if (key == "blacklevel")
                     {
                         float blacklevel;
                         Util.ConvertFloatLocale(ref value);
-                        blacklevel = float.Parse(value);
+                        blacklevel = float.Parse(value, _configFileNumberFormat);
                         color.m_blacklevel = blacklevel;
                     }
                 }
@@ -335,8 +341,8 @@ namespace boblightc
             {
                 float[] hscan = new float[2];
                 string[] linePieces = line.Split(' ');
-                hscan[0] = float.Parse(linePieces[0]);
-                hscan[1] = float.Parse(linePieces[1]);
+                hscan[0] = float.Parse(linePieces[0], _configFileNumberFormat);
+                hscan[1] = float.Parse(linePieces[1], _configFileNumberFormat);
 
                 //sscanf(line.c_str(), "%f %f", hscan, hscan + 1);
                 light.SetHscan(hscan);
@@ -347,8 +353,8 @@ namespace boblightc
             {
                 float[] vscan = new float[2];
                 string[] linePieces = line.Split(' ');
-                vscan[0] = float.Parse(linePieces[0]);
-                vscan[1] = float.Parse(linePieces[1]);
+                vscan[0] = float.Parse(linePieces[0], _configFileNumberFormat);
+                vscan[1] = float.Parse(linePieces[1], _configFileNumberFormat);
 
                 //sscanf(line.c_str(), "%f %f", vscan, vscan + 1);
                 light.SetVscan(vscan);
@@ -1053,16 +1059,18 @@ namespace boblightc
                         continue;
                     }
                     else if (key == "gamma" || key == "adjust" || key == "blacklevel")
-                    { //these are floats from 0.0 to 1.0, except gamma which is from 0.0 and up
+                    { 
+                        //these are floats from 0.0 to 1.0, except gamma which is from 0.0 and up
                         float fvalue;
-                        if (!float.TryParse(value, out fvalue) || fvalue < 0.0 || (key != "gamma" && fvalue > 1.0))
+                        if (!float.TryParse(value, NumberStyles.Float, _configFileNumberFormat, out fvalue) || fvalue < 0.0 || (key != "gamma" && fvalue > 1.0))
                         {
                             Util.LogError($"{m_filename} line {linenr} section [color]: wrong value {value} for key {key}");
                             valid = false;
                         }
                     }
                     else if (key == "rgb")
-                    { //rgb lines in hex notation, like: rgb FF0000 for red and rgb 0000FF for blue
+                    { 
+                        //rgb lines in hex notation, like: rgb FF0000 for red and rgb 0000FF for blue
                         int rgb;
                         bool parsedValue = Int32.TryParse(value, NumberStyles.HexNumber, null, out rgb);
 
@@ -1129,8 +1137,8 @@ namespace boblightc
 
                         scanrange = value + " " + scanrange;
                         string[] scanRangePieces = scanrange.Split(' ');
-                        bool parsedValueOne = float.TryParse(scanRangePieces[0], out scan[0]);
-                        bool parsedValueTwo = float.TryParse(scanRangePieces[1], out scan[1]);
+                        bool parsedValueOne = float.TryParse(scanRangePieces[0], NumberStyles.Float | NumberStyles.AllowThousands, _configFileNumberFormat, out scan[0]);
+                        bool parsedValueTwo = float.TryParse(scanRangePieces[1], NumberStyles.Float | NumberStyles.AllowThousands, _configFileNumberFormat, out scan[1]);
 
                         if (!parsedValueOne || !parsedValueTwo || scan[0] < 0.0 || scan[0] > 100.0 || scan[1] < 0.0 || scan[1] > 100.0 || scan[0] > scan[1])
                         {
