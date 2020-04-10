@@ -52,7 +52,7 @@ namespace boblightc
                     return; // failed
                 if (!config.CheckConfig())
                     return;
-                if (!config.BuildConfig(clients, devices, lights))
+                if (!config.BuildConfig(clients, clients, devices, lights))
                     return;
             }
 

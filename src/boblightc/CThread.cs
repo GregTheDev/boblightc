@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace boblightc
 {
-    internal abstract class CThread : IDisposable
+    public abstract class CThread : IDisposable
     {
         bool disposed = false;
 
@@ -11,6 +11,8 @@ namespace boblightc
         //protected volatile bool m_stop;
         protected ManualResetEvent m_stop;
         protected volatile bool m_running;
+        protected bool _runOnce;
+        protected int _maxIterations;
 
         public virtual void Process() { }
 
@@ -22,11 +24,30 @@ namespace boblightc
             m_stop = new ManualResetEvent(false);
         }
 
-        internal void StartThread()
+        public void StartThread()
         {
             m_running = true;
             m_thread = new Thread(new ThreadStart(ThreadFunction));
             m_thread.Start();
+        }
+
+        /// <summary>
+        /// Starts the thread.
+        /// </summary>
+        /// <param name="runOnce">Indicates whether the thread should only execute once. True - the thread method exeutes once and exists. False - the thread runs as usual.</param>
+        public void Run(int iterations)
+        {
+            if (iterations > 0)
+            {
+                _runOnce = true;
+                _maxIterations = iterations;
+
+                ThreadFunction();
+            }
+            else
+            {
+                StartThread();
+            }
         }
 
         private void ThreadFunction()

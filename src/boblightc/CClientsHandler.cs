@@ -6,7 +6,7 @@ using System.Net.Sockets;
 
 namespace boblightc
 {
-    internal class CClientsHandler
+    public class CClientsHandler : IServerConfiguration, IChannelDataProvider
     {
         private const int SUCCESS = 0; //TODO:xxx
         private const int FAIL = 1;
@@ -27,7 +27,7 @@ namespace boblightc
             this.m_mutex = new CMutex();
         }
 
-        internal void SetInterface(string interfaceAddress, int port)
+        public void SetInterface(string interfaceAddress, int port)
         {
             this.m_address = interfaceAddress;
             this.m_port = port;
@@ -198,6 +198,7 @@ namespace boblightc
                 //usedlights.unique();
 
                 //reset singlechange
+                //TODO: Probably need to make sure Distinct() works as expected
                 foreach (var usedLight in usedlights.Distinct())
                     usedLight.ResetSingleChange(device);
 

@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace boblightc
 {
-    class CConfig
+    public class CConfig
     {
         private const int SECTNOTHING = 0;
         private const int SECTGLOBAL = 1;
@@ -143,7 +143,7 @@ namespace boblightc
             return true;
         }
 
-        internal bool BuildConfig(CClientsHandler clients, List<CDevice> devices, List<CLight> lights)
+        public bool BuildConfig(IServerConfiguration clients, IChannelDataProvider channelDataProvider, List<CDevice> devices, List<CLight> lights)
         {
             Util.Log("building config");
 
@@ -153,7 +153,7 @@ namespace boblightc
             if (!BuildColorConfig(colors))
                 return false;
 
-            if (!BuildDeviceConfig(devices, clients))
+            if (!BuildDeviceConfig(devices, channelDataProvider))
                 return false;
 
             if (!BuildLightConfig(lights, devices, colors))
@@ -164,7 +164,7 @@ namespace boblightc
             return true;
         }
 
-        private void BuildClientsHandlerConfig(CClientsHandler clients)
+        private void BuildClientsHandlerConfig(IServerConfiguration clients)
         {
             //set up where to bind the listening socket
             //config for this should already be valid here, of course we can't check yet if the interface actually exists
@@ -376,7 +376,7 @@ namespace boblightc
             return true;
         }
 
-        private bool BuildDeviceConfig(List<CDevice> devices, CClientsHandler clients)
+        private bool BuildDeviceConfig(List<CDevice> devices, IChannelDataProvider clients)
         {
             for (int i = 0; i < m_devicelines.Count; i++)
             {
@@ -553,7 +553,7 @@ namespace boblightc
             return true;
         }
 
-        private bool BuildRS232(out CDevice device, int devicenr, CClientsHandler clients, string type)
+        private bool BuildRS232(out CDevice device, int devicenr, IChannelDataProvider clients, string type)
         {
             CDeviceRS232 rs232device = new CDeviceRS232(clients);
             device = rs232device;
@@ -840,7 +840,7 @@ namespace boblightc
             return -1;
         }
 
-        internal bool CheckConfig()
+        public bool CheckConfig()
         {
             bool valid = true;
             Util.Log("checking config lines");

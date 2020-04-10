@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace boblightc.Device
 {
-    internal abstract class CDevice : CThread
+    public abstract class CDevice : CThread
     {
         public const int NOTHING = 0;
         public const int MOMO = 1;
@@ -47,9 +47,9 @@ namespace boblightc.Device
         private int m_threadpriority;
         private bool m_setpriority;
         protected int m_type;
-        protected CClientsHandler m_clients;
+        protected IChannelDataProvider m_clients;
 
-        public CDevice(CClientsHandler clients)
+        public CDevice(IChannelDataProvider clients)
             : base()
         {
             m_clients = clients;
@@ -73,6 +73,8 @@ namespace boblightc.Device
 
         public override void Process()
         {
+            int iterations = 0;
+
             if (string.IsNullOrEmpty(Output))
                 Util.Log($"{Name}: starting");
             else
@@ -125,6 +127,16 @@ namespace boblightc.Device
                         long sleepTimeInMicroSeconds = Math.Max(1000000L - (Util.GetTimeUs() - setuptime), 0);
                         Thread.Sleep((int) (sleepTimeInMicroSeconds / 1000));
                         break;
+                    }
+
+                    if (base._runOnce)
+                    {
+                        iterations++;
+
+                        if (iterations > _maxIterations)
+                        {
+                            m_stop.Set();
+                        }
                     }
                 }
 
