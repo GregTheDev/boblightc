@@ -2,7 +2,7 @@
 
 namespace boblightc
 {
-    internal class CChannel
+    public class CChannel
     {
         private float m_speed;
         private float m_fallback;
@@ -89,7 +89,7 @@ namespace boblightc
             return outputvalue;
         }
 
-        internal void SetSpeed(float speed)
+        public void SetSpeed(float speed)
         {
             m_speed = speed;
         }
@@ -99,32 +99,32 @@ namespace boblightc
             m_wantedvalue = m_fallback;
         }
 
-        internal void SetGamma(float gamma)
+        public void SetGamma(float gamma)
         {
             m_gamma = gamma;
         }
 
-        internal void SetAdjust(float adjust)
+        public void SetAdjust(float adjust)
         {
             m_adjust = adjust;
         }
 
-        internal void SetBlacklevel(float blacklevel)
+        public void SetBlacklevel(float blacklevel)
         {
             m_blacklevel = blacklevel;
         }
 
-        internal void SetUsed(bool used)
+        public void SetUsed(bool used)
         {
             m_isused = used;
         }
 
-        internal void SetValue(float value)
+        public void SetValue(float value)
         {
             m_wantedvalue = value;
         }
 
-        internal void SetSingleChange(float singlechange)
+        public void SetSingleChange(float singlechange)
         {
             //if sync mode is off, then there's no synchronisation between a client writing a singlechange
             //and a device reading a singlechange, so it's possible that a client writes a singlechange

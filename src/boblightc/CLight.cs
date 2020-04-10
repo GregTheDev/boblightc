@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace boblightc
 {
-    internal class CLight
+    public class CLight
     {
         private float[] m_hscan = new float[2];
         private float[] m_vscan = new float[2];

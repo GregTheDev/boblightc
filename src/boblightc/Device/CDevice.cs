@@ -133,7 +133,7 @@ namespace boblightc.Device
                     {
                         iterations++;
 
-                        if (iterations > _maxIterations)
+                        if (iterations >= _maxIterations)
                         {
                             m_stop.Set();
                         }
