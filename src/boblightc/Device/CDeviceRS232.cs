@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace boblightc.Device
 {
-    internal class CDeviceRS232 : CDevice
+    public class CDeviceRS232 : CDevice
     {
         private byte[] m_buff;
         //private List<byte> m_prefix;
@@ -12,9 +12,9 @@ namespace boblightc.Device
         private int m_buffsize;
         private CSignalTimer m_timer;
         private int m_bytes;
-        private CSerialPort m_serialport;
+        private ISerialPort m_serialport;
 
-        public CDeviceRS232(CClientsHandler clients)
+        public CDeviceRS232(IChannelDataProvider clients)
             : base(clients)
         {
             m_type = -1;
@@ -23,7 +23,6 @@ namespace boblightc.Device
             m_buffsize = 0;
 
             m_timer = new CSignalTimer(false); //TODO: m_stop???
-            m_serialport = new CSerialPort();
         }
 
         void SetType(int type)
@@ -138,7 +137,13 @@ namespace boblightc.Device
 
         private bool OpenSerialPort()
         {
+            if (Output == "SerialPortMock")
+                m_serialport = MockSerialPort.Instance;
+            else
+                m_serialport = (ISerialPort) new CSerialPort();
+
             bool opened = m_serialport.Open(Output, Rate);
+
             if (m_serialport.HasError())
             {
                 Util.LogError($"{Name}: {m_serialport.GetError()}");
@@ -149,6 +154,22 @@ namespace boblightc.Device
             m_serialport.PrintToStdOut(m_debug); //print serial data to stdout when debug mode is on
 
             return opened;
+        }
+
+        protected override void CloseDevice()
+        {
+            //if opened, set all channels to 0 before closing
+            if (m_buff != null)
+            {
+                Array.Clear(m_buff, m_prefix.Count, m_channels.Count * m_bytes);
+                //memset(m_buff + m_prefix.size(), 0, m_channels.size() * m_bytes);
+                m_serialport.Write(m_buff, m_buffsize);
+
+                m_buff = null;
+                m_buffsize = 0;
+            }
+
+            m_serialport.Dispose();
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using boblightc.Device;
+using System;
 using System.IO.Ports;
 
 namespace boblightc
 {
-    internal class CSerialPort : IDisposable
+    internal class CSerialPort : ISerialPort
     {
         private bool disposed = false;
         private SerialPort _serialPort;
@@ -16,7 +17,7 @@ namespace boblightc
             _serialPort = new SerialPort();
         }
 
-        internal int Write(byte[] data, int len)
+        public int Write(byte[] data, int len)
         {
             //fd_set port;
 
@@ -75,12 +76,12 @@ namespace boblightc
             return byteswritten;
         }
 
-        internal string GetError()
+        public string GetError()
         {
             return m_name + ": " + m_error;
         }
 
-        internal bool Open(string name, int baudrate, int databits = 8, StopBits stopbits = StopBits.One, Parity parity = Parity.None)
+        public bool Open(string name, int baudrate, int databits = 8, StopBits stopbits = StopBits.One, Parity parity = Parity.None)
         {
             m_name = name;
             m_error = null;
@@ -181,7 +182,7 @@ namespace boblightc
             return true;
         }
 
-        internal bool HasError()
+        public bool HasError()
         {
             return !string.IsNullOrEmpty(m_error);
         }
