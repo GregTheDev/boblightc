@@ -13,8 +13,6 @@ namespace boblightc
         private float m_adjust;
         private float m_blacklevel;
         private float m_singlechange;
-        private int m_color;
-        private int m_light;
 
         public int Color { get; internal set; }
         public int Light { get; internal set; }
@@ -22,8 +20,6 @@ namespace boblightc
 
         public CChannel()
         {
-            m_color = -1;
-            m_light = -1;
 
             m_isused = false;
 

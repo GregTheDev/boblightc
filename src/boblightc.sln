@@ -12,7 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "boblightc.tests", "boblightc.tests\boblightc.tests.csproj", "{814BFDB9-0B87-45AB-821F-AE1C1A30062D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "boblightc.tests", "boblightc.tests\boblightc.tests.csproj", "{814BFDB9-0B87-45AB-821F-AE1C1A30062D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "boblightc.tests.integration", "boblightc.tests.integration\boblightc.tests.integration.csproj", "{2A8E4BC9-861D-4C73-8CE0-D5572B08816E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{814BFDB9-0B87-45AB-821F-AE1C1A30062D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{814BFDB9-0B87-45AB-821F-AE1C1A30062D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{814BFDB9-0B87-45AB-821F-AE1C1A30062D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A8E4BC9-861D-4C73-8CE0-D5572B08816E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A8E4BC9-861D-4C73-8CE0-D5572B08816E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A8E4BC9-861D-4C73-8CE0-D5572B08816E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A8E4BC9-861D-4C73-8CE0-D5572B08816E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
