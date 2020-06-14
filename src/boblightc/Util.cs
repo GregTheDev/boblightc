@@ -1,9 +1,10 @@
-﻿using log4net;
-using log4net.Config;
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+
+using log4net;
+using log4net.Config;
 
 namespace boblightc
 {
@@ -11,6 +12,8 @@ namespace boblightc
     {
         private static ILog _logger;
         private static DateTime UnixEpoch = new DateTime(1970, 1, 1);
+        
+        public static NumberFormatInfo NumbersFormat;
 
         static Util()
         {
@@ -18,6 +21,11 @@ namespace boblightc
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
             _logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+            NumbersFormat = new NumberFormatInfo()
+            {
+                NumberDecimalSeparator = "."
+            };
         }
 
         internal static void LogError(string message)
@@ -75,8 +83,8 @@ namespace boblightc
         {
             string localDecimalSeperator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
-            value.Replace(",", localDecimalSeperator);
-            value.Replace(".", localDecimalSeperator);
+            value = value.Replace(",", localDecimalSeperator);
+            value = value.Replace(".", localDecimalSeperator);
         }
 
         internal static void Debug(string message)
@@ -84,20 +92,32 @@ namespace boblightc
             _logger.Debug(message);
         }
 
-        internal static void ConvertYesNoOnOffToTrueFalse(ref string value)
+        internal static bool StrToBool(string value, out bool result)
         {
-            value = value.Replace("y", "true", StringComparison.InvariantCultureIgnoreCase);
-            value = value.Replace("n", "false", StringComparison.InvariantCultureIgnoreCase);
-            value = value.Replace("yes", "true", StringComparison.InvariantCultureIgnoreCase);
-            value = value.Replace("no", "false", StringComparison.InvariantCultureIgnoreCase);
-            value = value.Replace("off", "false", StringComparison.InvariantCultureIgnoreCase);
-            value = value.Replace("on", "true", StringComparison.InvariantCultureIgnoreCase);
+            if (value == "1" || value == "true" || value == "on" || value == "yes" || value == "y")
+            {
+                result = true;
+                return true;
+            }
+            else if (value == "0" || value == "false" || value == "off" || value == "no" || value == "n")
+            {
+                result = false;
+                return true;
+            }
+
+            result = false;
+
+            return false;
         }
 
         internal static long GetTimeUs()
         {
             // From: https://stackoverflow.com/questions/4856659/is-there-an-equivalent-of-gettimeofday-in-net
             TimeSpan timeSinceEpoch = DateTime.UtcNow - UnixEpoch;
+
+            long timeDiff = Math.Abs((long)(timeSinceEpoch.TotalMilliseconds * 1000) - (timeSinceEpoch.Ticks / 10));
+
+            System.Diagnostics.Debug.Assert(timeDiff < 1000 );
 
             return timeSinceEpoch.Ticks / 10; // Tick is 100ns
         }

@@ -222,21 +222,21 @@ namespace boblightc
                     {
                         float gamma;
                         Util.ConvertFloatLocale(ref value);
-                        gamma = float.Parse(value, _configFileNumberFormat);
+                        gamma = float.Parse(value);
                         color.m_gamma = gamma;
                     }
                     else if (key == "adjust")
                     {
                         float adjust;
                         Util.ConvertFloatLocale(ref value);
-                        adjust = float.Parse(value, _configFileNumberFormat);
+                        adjust = float.Parse(value);
                         color.m_adjust = adjust;
                     }
                     else if (key == "blacklevel")
                     {
                         float blacklevel;
                         Util.ConvertFloatLocale(ref value);
-                        blacklevel = float.Parse(value, _configFileNumberFormat);
+                        blacklevel = float.Parse(value);
                         color.m_blacklevel = blacklevel;
                     }
                 }
@@ -739,8 +739,7 @@ namespace boblightc
 
             Util.GetWord(ref line, out strvalue);
 
-            bool allowsync;
-            allowsync = bool.Parse(strvalue);
+            Util.StrToBool(strvalue, out bool allowsync);
             device.AllowSync = allowsync;
         }
 
@@ -753,11 +752,7 @@ namespace boblightc
 
             Util.GetWord(ref line, out strvalue);
 
-            // Port: seems some versions of config file allow for on/off and other true/false
-            Util.ConvertYesNoOnOffToTrueFalse(ref strvalue);
-
-            bool debug;
-            debug = bool.Parse(strvalue);
+            Util.StrToBool(strvalue, out bool debug);
             device.Debug = debug;
         }
 
@@ -998,7 +993,7 @@ namespace boblightc
                     else if (key == "allowsync" || key == "debug")//bool
                     {
                         bool bValue;
-                        if (!bool.TryParse(value, out bValue))
+                        if (!Util.StrToBool(value, out bValue))
                         {
                             if (key == "debug" && (value == "on" || value == "off")) break; //TODO: sample config has on/off not true/false
 
