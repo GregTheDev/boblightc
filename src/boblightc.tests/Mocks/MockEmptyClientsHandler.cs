@@ -14,7 +14,7 @@ namespace boblightc.tests.Mocks
             ChannelSampleValues = channelSampleValues;
         }
 
-        public void FillChannels(List<CChannel> channels, long time, CDevice device)
+        public void FillChannels(IReadOnlyList<CChannel> channels, long time, CDevice device)
         {
             for (int i = 0; i < channels.Count; i++)
             {

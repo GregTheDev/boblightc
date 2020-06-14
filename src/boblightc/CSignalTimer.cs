@@ -41,8 +41,6 @@ namespace boblightc
                 //wait for the timeout, or for the condition variable to be signaled
                 while (!m_signaled && sleeptime > 0L && m_timerstop == false)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Sleep: {sleeptime/1000}");
-
                     //Greg: We need sleeptime in milliseconds, not micro senconds for windows/.net
                     m_condition.WaitOne((int)Math.Min(sleeptime/1000, 1000000/1000));
                     now = Util.GetTimeUs();

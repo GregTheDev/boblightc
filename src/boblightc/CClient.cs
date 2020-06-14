@@ -3,15 +3,16 @@ using System.Collections.Generic;
 
 namespace boblightc
 {
-    internal class CClient : IDisposable
+    public class CClient : IDisposable
     {
-        public CTcpClientSocket m_socket;       //tcp socket for the client
+        internal CTcpClientSocket m_socket;       //tcp socket for the client
         public CMessageQueue m_messagequeue;
 
         internal long m_connecttime;
         internal List<CLight> m_lights;
         private Dictionary<string, int> m_lightnrs;
         internal int m_priority; //TODO: need to verify this
+        public IReadOnlyList<CLight> Lights { get { return m_lights; } }
 
         public CClient()
         {

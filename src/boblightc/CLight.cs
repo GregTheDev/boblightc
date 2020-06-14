@@ -20,6 +20,7 @@ namespace boblightc
         public int NrColors { get { return m_colors.Count; } }
         public string Name { get; internal set; }
         public Dictionary<CDevice, float> m_users;
+        public long PreviousTime { get { return m_prevtime; } }
 
         public CLight()
         {
@@ -44,7 +45,7 @@ namespace boblightc
             m_vscan[1] = 100.0f;
         }
 
-        internal void AddColor(CColor color)
+        public void AddColor(CColor color)
         {
             this.m_colors.Add(color);
         }
@@ -74,16 +75,31 @@ namespace boblightc
             return m_hscan;
         }
 
-        internal void SetRgb(float[] rgb, long time)
+        public void SetRgb(float[] rgb, long time)
         {
             for (int i = 0; i < 3; i++)
                 rgb[i] = Math.Clamp(rgb[i], 0.0f, 1.0f);
 
-            m_prevrgb = (float[]) m_rgb.Clone();
-            m_rgb = (float[]) rgb.Clone();
+            for (int i = 0; i < 3; i++)
+                m_prevrgb[i] = m_rgb[i];
+            //m_prevrgb = (float[]) m_rgb.Clone();
+
+            for (int i = 0; i < 3; i++)
+                m_rgb[i] = rgb[i];
+            //m_rgb = (float[]) rgb.Clone();
 
             m_prevtime = m_time;
             m_time = time;
+        }
+
+        public float[] GetRgb()
+        {
+            return (float[])m_rgb.Clone();
+        }
+
+        public float[] GetPreviousRgb ()
+        { 
+            return (float[])m_prevrgb.Clone(); 
         }
 
         internal void SetSpeed(float speed)
@@ -131,7 +147,7 @@ namespace boblightc
             return m_speed;
         }
 
-        internal float GetColorValue(int colornr, long time)
+        public float GetColorValue(int colornr, long time)
         {
             if (m_interpolation && m_prevtime == -1) //need two writes for interpolation
                 return 0.0f;

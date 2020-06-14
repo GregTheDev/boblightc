@@ -1,6 +1,7 @@
 ﻿using boblightc.Device;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 
@@ -14,10 +15,11 @@ namespace boblightc
         private List<CLight> m_lights;
         private List<CClient> m_clients;
         private CTcpServerSocket m_socket;
+        private CMutex m_mutex;
 
         public string m_address { get; private set; }
         public int m_port { get; private set; }
-        private CMutex m_mutex;
+        public IReadOnlyList<CClient> Clients { get { return m_clients; } }
 
         public CClientsHandler(List<CLight> lights)
         {
@@ -33,7 +35,7 @@ namespace boblightc
             this.m_port = port;
         }
 
-        internal void Process()
+        public void Process()
         {
             //open listening socket if it's not already
             if (!m_socket.IsOpen)
@@ -135,7 +137,7 @@ namespace boblightc
             return waitsockets;
         }
 
-        public void FillChannels(List<CChannel> channels, long time, CDevice device)
+        public void FillChannels(IReadOnlyList<CChannel> channels, long time, CDevice device)
         {
             List<CLight> usedlights = new List<CLight>();
 
@@ -193,28 +195,22 @@ namespace boblightc
                     usedlights.Add(m_clients[clientnr].m_lights[light]);
                 }
 
-                //remove duplicate lights
-                //usedlights.sort();
-                //usedlights.unique();
-
                 //reset singlechange
-                //TODO: Probably need to make sure Distinct() works as expected
-                foreach (var usedLight in usedlights.Distinct())
+                var distinctLights = usedlights.Distinct();
+
+                foreach (var usedLight in distinctLights)
                     usedLight.ResetSingleChange(device);
 
-
-                //for (list<CLight*>::iterator it = usedlights.begin(); it != usedlights.end(); it++)
-                //    (*it)->ResetSingleChange(device);
-
                 //update which lights we're using
-                for (int i = 0; i < m_clients.Count; i++)
+                foreach (CClient client in m_clients)
                 {
-                    for (int j = 0; j < m_clients[i].m_lights.Count; j++)
+                    foreach (CLight clientLight in client.m_lights)
                     {
                         bool lightused = false;
-                        foreach (CLight it in usedlights)// list<CLight*>::iterator it = usedlights.begin(); it != usedlights.end(); it++)
+
+                        foreach (CLight it in distinctLights)
                         {
-                            if (it == m_clients[i].m_lights[j])
+                            if (it == clientLight)
                             {
                                 lightused = true;
                                 break;
@@ -222,9 +218,9 @@ namespace boblightc
                         }
 
                         if (lightused)
-                            m_clients[i].m_lights[j].AddUser(device);
+                            clientLight.AddUser(device);
                         else
-                            m_clients[i].m_lights[j].ClearUser(device);
+                            clientLight.ClearUser(device);
                     }
                 }
             }
@@ -299,14 +295,10 @@ namespace boblightc
             }
             else if (messagekey == "ping")
             {
-                Util.Log($"{client.m_socket.Address}:{client.m_socket.Port} said ping");
-
                 return SendPing(client);
             }
             else if (messagekey == "get")
             {
-                Util.Log($"{client.m_socket.Address}:{client.m_socket.Port} said get");
-
                 return ParseGet(client, message);
             }
             else if (messagekey == "set")
@@ -443,8 +435,7 @@ namespace boblightc
                 bool interpolation;
                 string value;
 
-                //TODO: check for true/false vs y/n
-                if (!Util.GetWord(ref message.message, out value) || !bool.TryParse(value, out interpolation))
+                if (!Util.GetWord(ref message.message, out value) || !Util.StrToBool(value, out interpolation))
                 {
                     Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
                     return false;
@@ -460,8 +451,7 @@ namespace boblightc
                 bool use;
                 string value;
 
-                //TODO: check for true/false vs y/n
-                if (!Util.GetWord(ref message.message, out value) || !bool.TryParse(value, out use))
+                if (!Util.GetWord(ref message.message, out value) || !Util.StrToBool(value, out use))
                 {
                     Util.LogError($"{client.m_socket.Address}:{client.m_socket.Port} sent gibberish");
                     return false;
@@ -511,10 +501,14 @@ namespace boblightc
 
             if (messagekey == "version")
             {
+                Util.Log($"{client.m_socket.Address}:{client.m_socket.Port} said get version");
+
                 return SendVersion(client);
             }
             else if (messagekey == "lights")
             {
+                Util.Log($"{client.m_socket.Address}:{client.m_socket.Port} said get lights");
+
                 return SendLights(client);
             }
             else
@@ -536,10 +530,10 @@ namespace boblightc
                 data.SetData("light " + client.m_lights[i].Name + " ", true);
 
                 data.SetData("scan ", true);
-                data.SetData(client.m_lights[i].GetVscan()[0].ToString() + " ", true);
-                data.SetData(client.m_lights[i].GetVscan()[1].ToString() + " ", true);
-                data.SetData(client.m_lights[i].GetHscan()[0].ToString() + " ", true);
-                data.SetData(client.m_lights[i].GetHscan()[1].ToString(), true);
+                data.SetData(client.m_lights[i].GetVscan()[0].ToString(Util.NumbersFormat) + " ", true);
+                data.SetData(client.m_lights[i].GetVscan()[1].ToString(Util.NumbersFormat) + " ", true);
+                data.SetData(client.m_lights[i].GetHscan()[0].ToString(Util.NumbersFormat) + " ", true);
+                data.SetData(client.m_lights[i].GetHscan()[1].ToString(Util.NumbersFormat), true);
                 data.SetData("\n", true);
             }
 

@@ -17,7 +17,7 @@ namespace boblightc.tests.integration.Mocks
             _nextChannel = 0;
         }
 
-        public void FillChannels(List<CChannel> channels, long time, CDevice device)
+        public void FillChannels(IReadOnlyList<CChannel> channels, long time, CDevice device)
         {
             for (int j = 0; j < channels.Count; j++)
             {

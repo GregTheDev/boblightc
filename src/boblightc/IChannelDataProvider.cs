@@ -7,6 +7,6 @@ namespace boblightc
 {
     public interface IChannelDataProvider
     {
-        void FillChannels(List<CChannel> channels, long time, CDevice device);
+        void FillChannels(IReadOnlyList<CChannel> channels, long time, CDevice device);
     }
 }

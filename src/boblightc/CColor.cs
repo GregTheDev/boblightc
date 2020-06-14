@@ -2,10 +2,10 @@
 
 namespace boblightc
 {
-    internal class CColor
+    public class CColor
     {
-        public string Name { get; internal set; }
-        public float[] Rgb { get; internal set; }
+        public string Name { get; set; }
+        public float[] Rgb { get; set; }
         public float m_gamma { get; internal set; }
         public float m_adjust { get; internal set; }
         public float m_blacklevel { get; internal set; }
