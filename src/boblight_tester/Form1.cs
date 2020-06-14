@@ -81,7 +81,7 @@ namespace boblight_tester
 
         private void btnSetLightRgb_Click(object sender, EventArgs e)
         {
-            string[] rgbPieces = txtSetRgbRgb.Text.Split(',');
+            string[] rgbPieces = txtSetRgbRgb.Text.Split('|');
 
             Log("Sending 'set light rgb'...");
             _client.SetLightRgb(txtSetRgbLightName.Text, 

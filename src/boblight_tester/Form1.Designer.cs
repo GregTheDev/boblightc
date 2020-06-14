@@ -205,7 +205,7 @@
             this.txtSetRgbRgb.Name = "txtSetRgbRgb";
             this.txtSetRgbRgb.Size = new System.Drawing.Size(71, 22);
             this.txtSetRgbRgb.TabIndex = 15;
-            this.txtSetRgbRgb.Text = "0.1,0.2,0.3";
+            this.txtSetRgbRgb.Text = "0.1|0.2|0.3";
             this.txtSetRgbRgb.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // txtSetSpeedSpeed
